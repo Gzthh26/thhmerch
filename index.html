@@ -8,6 +8,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
+    <!-- PWA / Add to Home Screen Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="THH Merch">
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/3b82f6/FFFFFF?text=THH"> <!-- Replace with your 180x180 icon URL -->
+    <link rel="manifest" href="/manifest.json"> <!-- See conclusion for manifest.json content -->
+
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -174,6 +182,14 @@
                     <button type="button" onclick="addPending()" class="btn btn-primary">Add to Pending</button>
                 </div>
             </form>
+            <hr class="my-6">
+            <div>
+                <h3 class="text-md font-semibold mb-2">Bulk Data Entry</h3>
+                <textarea id="bulkData" class="form-input w-full" rows="5" placeholder="Paste vehicle data here, one vehicle per line. Use Tabs to separate columns in this order: Model, Make, Year, Type, Vin, Stock #."></textarea>
+                <div class="text-right mt-2">
+                    <button type="button" onclick="parseAndAddBulk()" class="btn btn-secondary">Parse & Add All</button>
+                </div>
+            </div>
         </section>
 
         <section class="card overflow-hidden">
@@ -243,8 +259,9 @@
         </section>
 
         <section class="card overflow-hidden">
-            <div class="p-6">
+            <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <h2 class="text-lg font-semibold">Daily Summary for <span id="reportDate" class="text-blue-600"></span></h2>
+                <input id="summaryDatePicker" type="date" class="form-input w-full md:w-auto" />
             </div>
             <div id="dailySummaryContent">
                 <div class="overflow-x-auto">
@@ -340,15 +357,17 @@
         <div class="modal-card w-full max-w-md p-6">
             <h3 class="text-lg font-semibold mb-4">Vehicle Description Features</h3>
             <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
-                <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof</label></div>
-                <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
+                <div class="flex items-center"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
+                <div class="flex items-center"><input id="descBluetooth" type="checkbox" class="form-checkbox mr-3"><label for="descBluetooth">Bluetooth</label></div>
                 <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
-                <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
-                <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
+                <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
                 <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Inbuilt Navigation</label></div>
+                <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
+                <div class="flex items-center"><input id="descMultiZoneClimate" type="checkbox" class="form-checkbox mr-3"><label for="descMultiZoneClimate">Multi Zone Climate</label></div>
+                <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
+                <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof/Moonroof</label></div>
+                <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
                 <div class="flex items-center"><input id="descWirelessCharger" type="checkbox" class="form-checkbox mr-3"><label for="descWirelessCharger">Wireless Charger</label></div>
-                <div class="flex items-center col-span-2"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
             </div>
             <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" onclick="closeDescriptionModal()" class="btn btn-secondary">Cancel</button>
@@ -421,15 +440,17 @@
                 <div class="border rounded-md p-4">
                     <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
                     <div class="grid grid-cols-2 gap-2">
-                        <div class="flex items-center"><input id="editLeatherSeats" type="checkbox" class="form-checkbox mr-2"><label for="editLeatherSeats" class="text-sm">Leather Seats</label></div>
-                        <div class="flex items-center"><input id="editSunroof" type="checkbox" class="form-checkbox mr-2"><label for="editSunroof" class="text-sm">Sunroof</label></div>
-                        <div class="flex items-center"><input id="editHeatedSteering" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSteering" class="text-sm">Heated Steering</label></div>
+                        <div class="flex items-center"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
+                        <div class="flex items-center"><input id="editBluetooth" type="checkbox" class="form-checkbox mr-2"><label for="editBluetooth" class="text-sm">Bluetooth</label></div>
                         <div class="flex items-center"><input id="editHeatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSeats" class="text-sm">Heated Seats</label></div>
-                        <div class="flex items-center"><input id="editVentilatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editVentilatedSeats" class="text-sm">Ventilated Seats</label></div>
-                        <div class="flex items-center"><input id="editPremiumSound" type="checkbox" class="form-checkbox mr-2"><label for="editPremiumSound" class="text-sm">Premium Sound</label></div>
+                        <div class="flex items-center"><input id="editHeatedSteering" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSteering" class="text-sm">Heated Steering</label></div>
                         <div class="flex items-center"><input id="editInbuiltNav" type="checkbox" class="form-checkbox mr-2"><label for="editInbuiltNav" class="text-sm">Inbuilt Navigation</label></div>
+                        <div class="flex items-center"><input id="editLeatherSeats" type="checkbox" class="form-checkbox mr-2"><label for="editLeatherSeats" class="text-sm">Leather Seats</label></div>
+                        <div class="flex items-center"><input id="editMultiZoneClimate" type="checkbox" class="form-checkbox mr-2"><label for="editMultiZoneClimate" class="text-sm">Multi Zone Climate</label></div>
+                        <div class="flex items-center"><input id="editPremiumSound" type="checkbox" class="form-checkbox mr-2"><label for="editPremiumSound" class="text-sm">Premium Sound</label></div>
+                        <div class="flex items-center"><input id="editSunroof" type="checkbox" class="form-checkbox mr-2"><label for="editSunroof" class="text-sm">Sunroof/Moonroof</label></div>
+                        <div class="flex items-center"><input id="editVentilatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editVentilatedSeats" class="text-sm">Ventilated Seats</label></div>
                         <div class="flex items-center"><input id="editWirelessCharger" type="checkbox" class="form-checkbox mr-2"><label for="editWirelessCharger" class="text-sm">Wireless Charger</label></div>
-                        <div class="flex items-center col-span-2"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
                     </div>
                     <textarea id="editOtherFeatures" rows="2" placeholder="Other Features (one per line)" class="form-input w-full mt-3"></textarea>
                 </div>
@@ -479,7 +500,7 @@
     const COMPLETED_PAGE_SIZE = 10;
     const DAILY_SUMMARY_PAGE_SIZE = 10;
     const sortState = {
-        pending: { col: 'date', dir: 'desc' },
+        pending: { col: 'createdAt', dir: 'desc' },
         completed: { col: 'completedAt', dir: 'desc' }
     };
     let currentEdit = { id: null, collection: '', data: {} };
@@ -532,9 +553,10 @@
                 const data = doc.data;
                 switch (column) {
                     case 'completedAt':
+                    case 'createdAt':
                         // Convert Firestore Timestamp to milliseconds for accurate sorting.
                         // Default to 0 if the timestamp doesn't exist (for older data).
-                        return data.completedAt?.toMillis() || 0;
+                        return data[column]?.toMillis() || 0;
                     case 'days':
                         return calculateDays(data.date);
                     case 'vinOrStock':
@@ -584,15 +606,17 @@
         if (!descriptionText) {
             const features = d.descriptionFeatures || {};
             const descriptionItems = [];
-            if (features.leatherSeats) descriptionItems.push('Leather Seats');
-            if (features.sunroof) descriptionItems.push('Sunroof');
-            if (features.heatedSteering) descriptionItems.push('Heated Steering');
+            if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
+            if(features.bluetooth) descriptionItems.push('Bluetooth');
             if (features.heatedSeats) descriptionItems.push('Heated Seats');
-            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.heatedSteering) descriptionItems.push('Heated Steering');
             if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+            if (features.leatherSeats) descriptionItems.push('Leather Seats');
+            if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
+            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
+            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
             if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-            if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
             if (features.other) {
                 features.other.split('\n').forEach(f => {
                     if (f.trim()) descriptionItems.push(f.trim());
@@ -626,23 +650,25 @@
     const createCompletedRow = doc => {
         const d = doc.data;
         const stockClass = (d.photoType === 'HP' && calculateDays(d.date) > 7) ? (calculateDays(d.date) > 14 ? 'bg-red-100' : 'bg-amber-100') : '';
-        const detailedIcon = d.detailed === 'Yes'
-            ? `<span class="text-green-500 font-bold text-lg">✓</span>`
+        const detailedIcon = d.detailed === 'Yes' 
+            ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
             : `<span class="text-red-500 font-bold text-lg">✗</span>`;
         
         let descriptionText = d.generatedDescription || '';
         if (!descriptionText) {
             const features = d.descriptionFeatures || {};
             const descriptionItems = [];
-            if (features.leatherSeats) descriptionItems.push('Leather Seats');
-            if (features.sunroof) descriptionItems.push('Sunroof');
-            if (features.heatedSteering) descriptionItems.push('Heated Steering');
+            if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
+            if(features.bluetooth) descriptionItems.push('Bluetooth');
             if (features.heatedSeats) descriptionItems.push('Heated Seats');
-            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.heatedSteering) descriptionItems.push('Heated Steering');
             if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+            if (features.leatherSeats) descriptionItems.push('Leather Seats');
+            if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
+            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
+            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
             if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-            if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
             if (features.other) {
                 features.other.split('\n').forEach(f => {
                     if (f.trim()) descriptionItems.push(f.trim());
@@ -673,7 +699,7 @@
             <td class="${recaptureClass}">${d.recaptureNeeded || 'No'}</td>
             <td class="text-gray-500 truncate cursor-pointer" ondblclick="openViewDescriptionModal('Half Photo Reason', \`${escapedHalfReason}\`)" title="Double-click to view full text">${d.halfReason || ''}</td>
             <td class="text-center">${calculateDays(d.originalEntryDate || d.date)}</td>
-            <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)">${descriptionText.split('\n')[0]}</td>
+            <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)" title="Double-click to view full text">${descriptionText.split('\n')[0]}</td>
             <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)" title="Double-click to view full text">${d.comment || ''}</td>
             <td><div class="flex items-center justify-center space-x-1">
                 <button onclick="moveToPending('${doc.id}')" class="btn btn-secondary text-xs">Recapture</button>
@@ -683,11 +709,11 @@
             </div></td></tr>`;
     };
 
-    function renderDailySummary(page = 0) {
-        const today = getTodayDate();
-        document.getElementById('reportDate').textContent = getDisplayDate(today);
+    function renderDailySummary(selectedDate, page = 0) {
+        const reportDate = selectedDate || getTodayDate();
+        document.getElementById('reportDate').textContent = getDisplayDate(reportDate);
         
-        let dailyEntries = completedData.filter(doc => doc.data.date === today);
+        let dailyEntries = completedData.filter(doc => doc.data.date === reportDate);
         dailyEntries.sort((a,b) => (b.data.completedAt?.toMillis() || 0) - (a.data.completedAt?.toMillis() || 0));
 
         const paginationContainer = document.getElementById('dailySummaryPagination');
@@ -715,23 +741,25 @@
         tbody.innerHTML = pageSlice.map(doc => {
             const d = doc.data;
             const toggleButton = (field, value) => `<button onclick="toggleSummaryStatus('${doc.id}', '${field}', ${!!value})" class="btn ${value ? 'btn-success' : 'btn-secondary'} text-xs">${value ? 'Yes' : 'No'}</button>`;
-            const detailedIcon = d.detailed === 'Yes'
-                ? `<span class="text-green-500 font-bold text-lg">✓</span>`
+            const detailedIcon = d.detailed === 'Yes' 
+                ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
                 : `<span class="text-red-500 font-bold text-lg">✗</span>`;
             
             let descriptionText = d.generatedDescription || '';
             if (!descriptionText) {
                 const features = d.descriptionFeatures || {};
                 const descriptionItems = [];
-                if (features.leatherSeats) descriptionItems.push('Leather Seats');
-                if (features.sunroof) descriptionItems.push('Sunroof');
-                if (features.heatedSteering) descriptionItems.push('Heated Steering');
+                if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
+                if(features.bluetooth) descriptionItems.push('Bluetooth');
                 if (features.heatedSeats) descriptionItems.push('Heated Seats');
-                if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-                if (features.premiumSound) descriptionItems.push('Premium Sound');
+                if (features.heatedSteering) descriptionItems.push('Heated Steering');
                 if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+                if (features.leatherSeats) descriptionItems.push('Leather Seats');
+                if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
+                if (features.premiumSound) descriptionItems.push('Premium Sound');
+                if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
+                if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
                 if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-                if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
                 if (features.other) {
                     features.other.split('\n').forEach(f => {
                         if (f.trim()) descriptionItems.push(f.trim());
@@ -778,7 +806,7 @@
     // ==========================
     // ACTIONS
     // ==========================
-    async function addPending() {
+    async function addPending(isBulk = false) {
         const formData = {
             vinOrStock: document.getElementById('vinOrStock').value.trim().toUpperCase(),
             make: capitalizeFirst(document.getElementById('make').value.trim()),
@@ -786,18 +814,143 @@
             trim: document.getElementById('trim').value.trim(),
             year: document.getElementById('year').value,
             date: document.getElementById('date').value,
-            comment: document.getElementById('comment').value.trim()
+            comment: document.getElementById('comment').value.trim(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if (!formData.vinOrStock || !formData.make || !formData.model || !formData.year || !formData.date) return showToast('Please fill all required fields.');
-        if (pendingData.some(item => (item.data.vinOrStock || item.data.stock) === formData.vinOrStock)) return showToast('Duplicate Stock/VIN in Pending list.');
+        if (!formData.vinOrStock || !formData.make || !formData.model || !formData.year || !formData.date) {
+            if (!isBulk) showToast('Please fill all required fields.');
+            return false;
+        }
+        if (pendingData.some(item => (item.data.vinOrStock || item.data.stock) === formData.vinOrStock)) {
+            if (!isBulk) showToast('Duplicate Stock/VIN in Pending list.');
+            return false;
+        }
         
-        showSpinner();
+        if (!isBulk) showSpinner();
         try {
             await db.collection('pending_vehicles').add(formData);
-            showToast('Vehicle added successfully!');
-            document.getElementById('dataEntryForm').reset();
-            document.getElementById('date').value = getTodayDate();
-        } catch (e) { console.error(e); showToast('Error adding entry.'); } finally { hideSpinner(); }
+            if (!isBulk) {
+                showToast('Vehicle added successfully!');
+                document.getElementById('dataEntryForm').reset();
+                document.getElementById('date').value = getTodayDate();
+            }
+            return true;
+        } catch (e) { 
+            console.error(e); 
+            if (!isBulk) showToast('Error adding entry.');
+            return false;
+        } finally { 
+            if (!isBulk) hideSpinner();
+        }
+    }
+
+    async function parseAndAddBulk() {
+        const text = document.getElementById('bulkData').value.trim();
+        if (!text) return showToast('Paste data into the bulk entry field.');
+
+        showSpinner();
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const line of lines) {
+            let parsedData;
+            if (line.includes('\t')) {
+                const parts = line.split('\t');
+                parsedData = {
+                    model: parts[0] || '',
+                    make: parts[1] || '',
+                    year: parts[2] || '',
+                    stockNo: parts[5] || '',
+                    trim: '' // Trim is not in this format
+                };
+            } else {
+                parsedData = parseSingleLine(line);
+            }
+
+            if (parsedData && parsedData.stockNo && parsedData.make && parsedData.model && parsedData.year) {
+                document.getElementById('vinOrStock').value = parsedData.stockNo;
+                document.getElementById('make').value = parsedData.make;
+                document.getElementById('model').value = parsedData.model;
+                document.getElementById('year').value = parsedData.year;
+                document.getElementById('trim').value = parsedData.trim;
+                document.getElementById('date').value = getTodayDate();
+                document.getElementById('comment').value = '';
+
+                const success = await addPending(true);
+                if (success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } else {
+                errorCount++;
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        document.getElementById('dataEntryForm').reset();
+        document.getElementById('date').value = getTodayDate();
+        document.getElementById('bulkData').value = '';
+        hideSpinner();
+        showToast(`Bulk operation finished. Added: ${successCount}. Failed/Skipped: ${errorCount}.`);
+    }
+
+    function parseSingleLine(line) {
+        let remainingLine = line.trim();
+        const makes = [
+            'Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge', 'Ford', 'GMC',
+            'Honda', 'Hyundai', 'Infiniti', 'Jaguar', 'Jeep', 'Kia', 'Land Rover', 'Lexus', 'Lincoln',
+            'Mazda', 'Mercedes-Benz', 'Mitsubishi', 'Nissan', 'Ram', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen', 'VW', 'Volvo'
+        ].sort((a, b) => b.length - a.length);
+
+        remainingLine = remainingLine.replace(/[A-Z0-9]{17}/g, '').trim();
+        remainingLine = remainingLine.replace(/\b(Used|New|CPO)\b/ig, '').trim();
+
+        const parts = remainingLine.split(/\s+/);
+        const stockNo = parts.pop();
+        remainingLine = parts.join(' ').trim();
+
+        let year = '';
+        const yearMatch = remainingLine.match(/\b(19|20)\d{2}\b/);
+        if (yearMatch) {
+            year = yearMatch[0];
+            remainingLine = remainingLine.replace(year, '').trim();
+        }
+
+        let make = '';
+        let model = '';
+        
+        for (const carMake of makes) {
+            const makeIndex = remainingLine.toLowerCase().lastIndexOf(carMake.toLowerCase());
+            if (makeIndex !== -1) {
+                make = carMake === 'VW' ? 'Volkswagen' : carMake;
+                model = remainingLine.substring(0, makeIndex).trim();
+                break;
+            }
+        }
+        
+        if (!make) {
+            for (const carMake of makes) {
+                if (remainingLine.toLowerCase().endsWith(carMake.toLowerCase().replace(/\s/g, ''))) {
+                    make = carMake === 'VW' ? 'Volkswagen' : carMake;
+                    model = remainingLine.substring(0, remainingLine.toLowerCase().lastIndexOf(carMake.toLowerCase().replace(/\s/g, ''))).trim();
+                    break;
+                }
+            }
+        }
+
+        if (!make) {
+            model = remainingLine;
+        }
+
+        return {
+            stockNo: stockNo ? stockNo.toUpperCase() : '',
+            make: capitalizeFirst(make),
+            model: capitalizeFirst(model),
+            year: year,
+            trim: ''
+        };
     }
     
     async function confirmComplete() {
@@ -981,7 +1134,8 @@
                         date: getTodayDate(), // Reset date to today
                         comment: `Moved back for recapture. Original comment: ${data.comment || ''}`, // Pre-fill a comment
                         descriptionFeatures: data.descriptionFeatures || {},
-                        generatedDescription: data.generatedDescription || ''
+                        generatedDescription: data.generatedDescription || '',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     await db.collection('pending_vehicles').add(pendingData);
                     await docRef.delete();
@@ -1136,14 +1290,14 @@
         try {
             // IMPORTANT: The API key is left blank as it's expected to be injected by the runtime environment.
             // If this feature fails, it is likely due to the execution environment not providing a valid API key.
-            const apiKey = "";
+            const apiKey = ""; 
             const model = "gemini-2.0-flash";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
             
             const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: prompt }]
+                contents: [{ 
+                    role: "user", 
+                    parts: [{ text: prompt }] 
                 }]
             };
 
@@ -1227,7 +1381,7 @@
         db.collection('vehicles').onSnapshot(snapshot => {
             completedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
             document.getElementById('searchCompleted').dispatchEvent(new Event('input'));
-            renderDailySummary();
+            renderDailySummary(document.getElementById('summaryDatePicker').value);
         }, err => { console.error(err); showToast('Error loading completed vehicles.'); });
         
         // Event Listeners
@@ -1306,8 +1460,15 @@
         document.getElementById('pendingNextBtn').onclick = () => renderTable('pending', 'pendingTable', pendingData, currentPendingPage + 1, PENDING_PAGE_SIZE, createPendingRow, 'No pending vehicles.');
         document.getElementById('completedPrevBtn').onclick = () => renderTable('completed', 'completedTable', filteredCompletedData, currentCompletedPage - 1, COMPLETED_PAGE_SIZE, createCompletedRow, 'No completed vehicles.');
         document.getElementById('completedNextBtn').onclick = () => renderTable('completed', 'completedTable', filteredCompletedData, currentCompletedPage + 1, COMPLETED_PAGE_SIZE, createCompletedRow, 'No completed vehicles.');
-        document.getElementById('dailySummaryPrevBtn').onclick = () => renderDailySummary(currentDailySummaryPage - 1);
-        document.getElementById('dailySummaryNextBtn').onclick = () => renderDailySummary(currentDailySummaryPage + 1);
+        
+        const summaryDatePicker = document.getElementById('summaryDatePicker');
+        summaryDatePicker.value = getTodayDate();
+        summaryDatePicker.addEventListener('change', (e) => {
+            renderDailySummary(e.target.value);
+        });
+
+        document.getElementById('dailySummaryPrevBtn').onclick = () => renderDailySummary(summaryDatePicker.value, currentDailySummaryPage - 1);
+        document.getElementById('dailySummaryNextBtn').onclick = () => renderDailySummary(summaryDatePicker.value, currentDailySummaryPage + 1);
         
         document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
         document.getElementById('confirmOkBtn').addEventListener('click', () => {
@@ -1345,4 +1506,3 @@
 </script>
 </body>
 </html>
-
