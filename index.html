@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THH Merchandising Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ======================================================================
+           "CLASSIC COMPACT" THEME
+        ====================================================================== */
+        :root {
+            --c-bg: #f8fafc; /* slate-50 */
+            --c-surface: #ffffff;
+            --c-text-primary: #1e293b; /* slate-800 */
+            --c-text-secondary: #64748b; /* slate-500 */
+            --c-border: #e2e8f0; /* slate-200 */
+            --c-primary: #3b82f6; /* blue-500 */
+            --c-primary-hover: #2563eb; /* blue-600 */
+            --c-danger: #ef4444; /* red-500 */
+            --c-warning: #f59e0b; /* amber-500 */
+            --c-success: #22c55e; /* green-500 */
+        }
+
+        /* Base */
+        body {
+            background-color: var(--c-bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--c-text-primary);
+        }
+
+        /* Layout & Cards */
+        .card {
+            background-color: var(--c-surface);
+            border-radius: 0.5rem;
+            border: 1px solid var(--c-border);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Buttons (More Compact) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem; /* Reduced padding */
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary { background-color: var(--c-primary); color: white; }
+        .btn-primary:hover { background-color: var(--c-primary-hover); }
+        .btn-secondary { background-color: var(--c-surface); color: var(--c-text-primary); border-color: var(--c-border); }
+        .btn-secondary:hover { background-color: #f8fafc; } /* slate-50 */
+        
+        .btn-success { background-color: var(--c-success); color: white; }
+        .btn-warning { background-color: var(--c-warning); color: white; }
+        .btn-danger { background-color: var(--c-danger); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-toggle-group .btn.active {
+            background-color: var(--c-primary);
+            color: white;
+            border-color: var(--c-primary);
+        }
+
+        /* Tables - BORDERED AND COMPACT */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse; /* Essential for bordered look */
+            border: 1px solid var(--c-border); /* Outer border */
+        }
+        .custom-table th {
+            padding: 0.6rem 0.75rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--c-text-secondary);
+            text-transform: uppercase;
+            background-color: #f8fafc; /* slate-50 */
+            border: 1px solid var(--c-border);
+        }
+        .custom-table td {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem; /* 13px */
+            border: 1px solid var(--c-border);
+        }
+        /* Zebra-striping */
+        .custom-table tbody tr:nth-of-type(even) {
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .custom-table tbody tr:hover {
+            background-color: #eff6ff; /* blue-50 */
+        }
+        
+        .sortable:hover { background-color: #f1f5f9; cursor: pointer; }
+        .sorted-asc::after { content: " ▲"; }
+        .sorted-desc::after { content: " ▼"; }
+        
+        .comment-cell {
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 250px;
+        }
+
+        /* Forms */
+        .form-input {
+            display: block; width: 100%; border-radius: 0.375rem;
+            border: 1px solid var(--c-border); padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .form-input:focus {
+            outline: none; border-color: var(--c-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .form-checkbox {
+            height: 1.25rem; width: 1.25rem; border-radius: 0.25rem;
+            border-color: var(--c-border); color: var(--c-primary);
+        }
+        .form-checkbox:focus {
+            ring: var(--c-primary);
+        }
+
+        /* Modal */
+        .modal-card {
+            background-color: var(--c-surface); border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            animation: spin 1s linear infinite; border-width: 4px;
+            border-style: solid; border-color: var(--c-border);
+            border-top-color: var(--c-primary); border-radius: 50%;
+            width: 3rem; height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="spinnerOverlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 hidden bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium z-50"></div>
+
+    <header class="bg-white sticky top-0 z-20 border-b border-gray-200">
+        <div class="px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-xl font-bold text-gray-900">THH Merchandising Report</h1>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <section class="card p-6">
+            <h2 class="text-lg font-semibold mb-4">Data Entry</h2>
+            <form id="dataEntryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                <input id="vinOrStock" placeholder="VIN or Stock No." class="form-input" />
+                <input id="make" placeholder="Make" class="form-input" />
+                <input id="model" placeholder="Model" class="form-input" />
+                <input id="trim" placeholder="Trim" class="form-input" />
+                <select id="year" class="form-input"><option value="">Year</option></select>
+                <input id="date" type="date" class="form-input" />
+                <input id="comment" placeholder="Comment (Optional)" class="form-input col-span-full md:col-span-2" />
+                <div class="sm:col-span-2 md:col-span-5 text-right mt-2">
+                    <button type="button" onclick="addPending()" class="btn btn-primary">Add to Pending</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold">Pending Vehicles</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th data-col="vinOrStock" class="sortable">Stock No.</th>
+                            <th data-col="make" class="sortable">Make</th>
+                            <th data-col="model" class="sortable">Model</th>
+                            <th data-col="trim" class="sortable">Trim</th>
+                            <th data-col="year" class="sortable">Year</th>
+                            <th data-col="date" class="sortable">Date</th>
+                            <th data-col="days" class="sortable text-center">Days</th>
+                            <th>Description</th>
+                            <th>Comment</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTable"></tbody>
+                </table>
+            </div>
+            <div class="p-4 flex justify-center items-center space-x-4 bg-slate-50 border-t border-slate-200">
+                <button id="pendingPrevBtn" class="btn btn-secondary">Previous</button>
+                <span id="pendingPageInfo" class="text-sm text-gray-600"></span>
+                <button id="pendingNextBtn" class="btn btn-secondary">Next</button>
+            </div>
+        </section>
+
+        <section class="card overflow-hidden">
+             <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <h2 class="text-lg font-semibold">Completed Vehicles</h2>
+                <input id="searchCompleted" type="text" placeholder="Search..." class="form-input w-full md:w-1/3" />
+            </div>
+            <div class="overflow-x-auto">
+                <table class="custom-table">
+                     <thead>
+                        <tr>
+                            <th data-col="vinOrStock" class="sortable">Stock No.</th>
+                            <th data-col="make" class="sortable">Make</th>
+                            <th data-col="model" class="sortable">Model</th>
+                            <th data-col="trim" class="sortable">Trim</th>
+                            <th data-col="year" class="sortable">Year</th>
+                            <th data-col="mileage" class="sortable">Mileage</th>
+                            <th data-col="date" class="sortable">Date</th>
+                            <th data-col="detailed" class="sortable text-center">Detailed</th>
+                            <th data-col="photoType" class="sortable">Photos</th>
+                            <th data-col="recaptureNeeded" class="sortable">Recapture?</th>
+                            <th data-col="halfReason" class="sortable">Half Reason</th>
+                            <th data-col="days" class="sortable text-center">Days</th>
+                            <th>Description</th>
+                            <th>Comment</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTable"></tbody>
+                </table>
+            </div>
+             <div class="p-4 flex justify-center items-center space-x-4 bg-slate-50 border-t border-slate-200">
+                <button id="completedPrevBtn" class="btn btn-secondary">Previous</button>
+                <span id="completedPageInfo" class="text-sm text-gray-600"></span>
+                <button id="completedNextBtn" class="btn btn-secondary">Next</button>
+            </div>
+        </section>
+
+        <section class="card overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-lg font-semibold">Daily Summary for <span id="reportDate" class="text-blue-600"></span></h2>
+            </div>
+            <div id="dailySummaryContent">
+                <div class="overflow-x-auto">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Make</th>
+                                <th>Model</th>
+                                <th>Trim</th>
+                                <th>Year</th>
+                                <th>Mileage</th>
+                                <th class="text-center">Detailed</th>
+                                <th>Description</th>
+                                <th class="text-center">Desc. Uploaded</th>
+                                <th class="text-center">Glovebox</th>
+                                <th class="text-center">Recaptured</th>
+                                <th>Photos</th>
+                                <th>Comment</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailySummaryTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="noDailyEntries" class="p-6 text-center text-gray-500 hidden">No vehicles completed today.</div>
+            <div id="dailySummaryPagination" class="p-4 flex justify-center items-center space-x-4 bg-slate-50 border-t border-slate-200 hidden">
+                <button id="dailySummaryPrevBtn" class="btn btn-secondary">Previous</button>
+                <span id="dailySummaryPageInfo" class="text-sm text-gray-600"></span>
+                <button id="dailySummaryNextBtn" class="btn btn-secondary">Next</button>
+            </div>
+        </section>
+    </main>
+    
+    <!-- MODALS -->
+
+    <!-- Complete Modal -->
+    <div id="completeModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
+        <div class="modal-card w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Complete Vehicle</h3>
+            <div class="space-y-4">
+                <input id="mileage" placeholder="Mileage" class="form-input" />
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Detailed?</label>
+                    <div id="detailed-toggle" class="mt-1 grid grid-cols-2 gap-2 btn-toggle-group">
+                        <button type="button" data-group="detailed" data-value="Yes" class="btn btn-secondary">Yes</button>
+                        <button type="button" data-group="detailed" data-value="No" class="btn btn-secondary">No</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Photos?</label>
+                    <div id="photos-toggle" class="mt-1 grid grid-cols-2 gap-2 btn-toggle-group">
+                        <button type="button" data-group="photos" data-value="FP" class="btn btn-secondary">FP</button>
+                        <button type="button" data-group="photos" data-value="HP" class="btn btn-secondary">HP</button>
+                    </div>
+                </div>
+                <div id="halfReasonContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Reason for half photos</label>
+                    <div class="mt-2 space-y-2">
+                        <div class="flex items-center">
+                            <input id="halfReasonNotCleaned" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="halfReasonNotCleaned" class="ml-2 block text-sm text-gray-900">Awaiting Detailing</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="halfReasonDamage" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="halfReasonDamage" class="ml-2 block text-sm text-gray-900">Exterior Damage</label>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Photos Need Recapture?</label>
+                     <div id="recapture-toggle" class="mt-1 grid grid-cols-2 gap-2 btn-toggle-group">
+                        <button type="button" data-group="recapture" data-value="Yes" class="btn btn-secondary">Yes</button>
+                        <button type="button" data-group="recapture" data-value="No" class="btn btn-secondary">No</button>
+                    </div>
+                </div>
+                 <div id="recaptureCommentContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Recapture Comment</label>
+                    <textarea id="recaptureComment" class="form-input mt-1" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeCompleteModal()" class="btn btn-secondary">Cancel</button>
+                <button type="button" onclick="confirmComplete()" class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Description Features Modal -->
+    <div id="descriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
+        <div class="modal-card w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Vehicle Description Features</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
+                <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof</label></div>
+                <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
+                <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
+                <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
+                <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
+                <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Inbuilt Navigation</label></div>
+                <div class="flex items-center"><input id="descWirelessCharger" type="checkbox" class="form-checkbox mr-3"><label for="descWirelessCharger">Wireless Charger</label></div>
+                <div class="flex items-center col-span-2"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeDescriptionModal()" class="btn btn-secondary">Cancel</button>
+                <button type="button" onclick="saveDescription()" class="btn btn-primary">Save Features</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Description Generation Modal -->
+    <div id="generateDescriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
+        <div class="modal-card w-full max-w-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Generate AI Description</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left side: Vehicle Info -->
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-gray-800">Vehicle Details</h4>
+                        <p id="aiVehicleInfo" class="text-sm text-gray-600 mt-1"></p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-gray-800">Selected Features</h4>
+                        <p id="aiFeaturesList" class="text-sm text-gray-600 mt-1"></p>
+                    </div>
+                    <button type="button" onclick="generateDescription()" class="btn btn-primary w-full">
+                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" /></svg>
+                        Generate Description
+                    </button>
+                </div>
+                <!-- Right side: Generated Text -->
+                <div class="relative">
+                     <div id="aiSpinner" class="absolute inset-0 bg-white/70 flex items-center justify-center hidden">
+                        <div class="spinner !w-10 !h-10"></div>
+                     </div>
+                    <textarea id="aiGeneratedText" class="form-input w-full h-64" placeholder="AI description will appear here..."></textarea>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeAIDescriptionModal()" class="btn btn-secondary">Cancel</button>
+                <button type="button" onclick="saveAIDescription()" class="btn btn-success">Save Description</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- View Description Modal -->
+    <div id="viewDescriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
+        <div class="modal-card w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Full Description</h3>
+            <p id="fullDescriptionText" class="text-gray-700 whitespace-pre-wrap"></p>
+            <div class="mt-6 flex justify-end">
+                <button type="button" onclick="closeViewDescriptionModal()" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4 overflow-y-auto">
+        <div class="modal-card w-full max-w-lg p-6 my-8">
+             <h3 class="text-lg font-semibold mb-4">Edit Vehicle Entry</h3>
+             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <input id="editVinOrStock" placeholder="VIN or Stock No." class="form-input" />
+                <input id="editMake" placeholder="Make" class="form-input" />
+                <input id="editModel" placeholder="Model" class="form-input" />
+                <input id="editTrim" placeholder="Trim" class="form-input" />
+                <select id="editYear" class="form-input"><option value="">Year</option></select>
+                <input id="editDate" type="date" class="form-input" />
+                <input id="editMileage" placeholder="Mileage" class="form-input hidden" />
+             </div>
+             <div class="space-y-4">
+                <div class="border rounded-md p-4">
+                    <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center"><input id="editLeatherSeats" type="checkbox" class="form-checkbox mr-2"><label for="editLeatherSeats" class="text-sm">Leather Seats</label></div>
+                        <div class="flex items-center"><input id="editSunroof" type="checkbox" class="form-checkbox mr-2"><label for="editSunroof" class="text-sm">Sunroof</label></div>
+                        <div class="flex items-center"><input id="editHeatedSteering" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSteering" class="text-sm">Heated Steering</label></div>
+                        <div class="flex items-center"><input id="editHeatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSeats" class="text-sm">Heated Seats</label></div>
+                        <div class="flex items-center"><input id="editVentilatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editVentilatedSeats" class="text-sm">Ventilated Seats</label></div>
+                        <div class="flex items-center"><input id="editPremiumSound" type="checkbox" class="form-checkbox mr-2"><label for="editPremiumSound" class="text-sm">Premium Sound</label></div>
+                        <div class="flex items-center"><input id="editInbuiltNav" type="checkbox" class="form-checkbox mr-2"><label for="editInbuiltNav" class="text-sm">Inbuilt Navigation</label></div>
+                        <div class="flex items-center"><input id="editWirelessCharger" type="checkbox" class="form-checkbox mr-2"><label for="editWirelessCharger" class="text-sm">Wireless Charger</label></div>
+                        <div class="flex items-center col-span-2"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
+                    </div>
+                    <textarea id="editOtherFeatures" rows="2" placeholder="Other Features (one per line)" class="form-input w-full mt-3"></textarea>
+                </div>
+                <textarea id="editComment" rows="3" placeholder="Comment" class="form-input w-full"></textarea>
+                <textarea id="editGeneratedDescription" rows="6" placeholder="AI Generated Description" class="form-input w-full"></textarea>
+             </div>
+             <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="saveEditBtn" class="btn btn-primary">Save Changes</button>
+             </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
+        <div class="modal-card w-full max-w-sm p-6">
+            <h3 class="text-lg font-semibold mb-2">Are you sure?</h3>
+            <p id="confirmMessage" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="confirmCancelBtn" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="confirmOkBtn" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // ==========================
+    // FIREBASE CONFIGURATION
+    // ==========================
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-hy3eteka35c3ZkLl7exTQ0nnFz9xhFU",
+        authDomain: "thh-merch-report.firebaseapp.com",
+        projectId: "thh-merch-report",
+        storageBucket: "thh-merch-report.appspot.com",
+        messagingSenderId: "214148544505",
+        appId: "1:214148544505:web:ef4889d43b8189f5146f28"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ==========================
+    // STATE & CONSTANTS
+    // ==========================
+    let pendingData = [], completedData = [], filteredCompletedData = [];
+    let currentPendingPage = 0, currentCompletedPage = 0, currentDailySummaryPage = 0;
+    const PENDING_PAGE_SIZE = 15;
+    const COMPLETED_PAGE_SIZE = 10;
+    const DAILY_SUMMARY_PAGE_SIZE = 10;
+    const sortState = {
+        pending: { col: 'date', dir: 'desc' },
+        completed: { col: 'completedAt', dir: 'desc' }
+    };
+    let currentEdit = { id: null, collection: '', data: {} };
+    let onConfirmCallback = null;
+
+    // ==========================
+    // UI & UTILITY FUNCTIONS
+    // ==========================
+    const showSpinner = () => document.getElementById('spinnerOverlay').classList.remove('hidden');
+    const hideSpinner = () => document.getElementById('spinnerOverlay').classList.add('hidden');
+    const closeModal = () => document.getElementById('editModal').classList.add('hidden');
+    const closeCompleteModal = () => document.getElementById('completeModal').classList.add('hidden');
+    const closeDescriptionModal = () => document.getElementById('descriptionModal').classList.add('hidden');
+    const closeViewDescriptionModal = () => document.getElementById('viewDescriptionModal').classList.add('hidden');
+    const closeAIDescriptionModal = () => document.getElementById('generateDescriptionModal').classList.add('hidden');
+    const closeConfirmModal = () => document.getElementById('confirmModal').classList.add('hidden');
+
+    const showToast = msg => {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 3000);
+    };
+    const getTodayDate = () => new Date().toISOString().split('T')[0];
+    const getDisplayDate = dateStr => new Date(dateStr + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const calculateDays = dateStr => Math.floor((new Date() - new Date(dateStr + 'T00:00:00')) / 86400000);
+    const capitalizeFirst = str => str ? str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : '';
+
+
+    function openConfirmModal(message, callback) {
+        onConfirmCallback = callback;
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function openViewDescriptionModal(title, text) {
+        document.getElementById('fullDescriptionText').textContent = text || "No content available.";
+        document.getElementById('viewDescriptionModal').querySelector('h3').textContent = title;
+        document.getElementById('viewDescriptionModal').classList.remove('hidden');
+    }
+
+    // ==========================
+    // RENDERING LOGIC
+    // ==========================
+    function applySort(tableKey, dataArray) {
+        const { col, dir } = sortState[tableKey];
+        return [...dataArray].sort((a, b) => {
+            // Helper to get comparable values from a document
+            const getValue = (doc, column) => {
+                const data = doc.data;
+                switch (column) {
+                    case 'completedAt':
+                        // Convert Firestore Timestamp to milliseconds for accurate sorting.
+                        // Default to 0 if the timestamp doesn't exist (for older data).
+                        return data.completedAt?.toMillis() || 0;
+                    case 'days':
+                        return calculateDays(data.date);
+                    case 'vinOrStock':
+                        return data.vinOrStock || data.stock || '';
+                    default:
+                        // Default case for string-based sorting
+                        return data[column] || '';
+                }
+            };
+
+            const valA = getValue(a, col);
+            const valB = getValue(b, col);
+
+            let comparison = 0;
+            // Use numeric comparison for numbers, and localeCompare for strings.
+            if (typeof valA === 'number' && typeof valB === 'number') {
+                comparison = valA - valB;
+            } else {
+                comparison = String(valA).localeCompare(String(valB), undefined, { numeric: true });
+            }
+
+            // Apply sort direction
+            return dir === 'asc' ? comparison : -comparison;
+        });
+    }
+
+    function renderTable(key, tbodyId, data, page, size, rowFunc, emptyMsg) {
+        const tbody = document.getElementById(tbodyId);
+        const sorted = applySort(key, data);
+        const totalItems = sorted.length, totalPages = Math.ceil(totalItems / size) || 1;
+        page = Math.max(0, Math.min(page, totalPages - 1));
+        if (key === 'pending') currentPendingPage = page; else currentCompletedPage = page;
+        
+        const pageSlice = sorted.slice(page * size, (page * size) + size);
+        tbody.innerHTML = pageSlice.length ? pageSlice.map(rowFunc).join('') : `<tr><td colspan="15" class="text-center py-10 text-gray-500">${emptyMsg}</td></tr>`;
+        
+        document.getElementById(`${key}PageInfo`).textContent = `Page ${page + 1} of ${totalPages}`;
+        document.getElementById(`${key}PrevBtn`).disabled = page === 0;
+        document.getElementById(`${key}NextBtn`).disabled = page >= totalPages - 1;
+    }
+
+    const createPendingRow = doc => {
+        const d = doc.data, days = calculateDays(d.date);
+        const badgeStyle = days > 3 ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100';
+        
+        let descriptionText = d.generatedDescription || '';
+        if (!descriptionText) {
+            const features = d.descriptionFeatures || {};
+            const descriptionItems = [];
+            if (features.leatherSeats) descriptionItems.push('Leather Seats');
+            if (features.sunroof) descriptionItems.push('Sunroof');
+            if (features.heatedSteering) descriptionItems.push('Heated Steering');
+            if (features.heatedSeats) descriptionItems.push('Heated Seats');
+            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
+            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
+            if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
+            if (features.other) {
+                features.other.split('\n').forEach(f => {
+                    if (f.trim()) descriptionItems.push(f.trim());
+                });
+            }
+            descriptionText = descriptionItems.join(' | ');
+        }
+        
+        const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
+        const escapedComment = (d.comment || '').replace(/`/g, '\\`');
+
+        return `<tr>
+            <td class="font-semibold text-gray-900">${d.vinOrStock || d.stock || ''}</td>
+            <td>${d.make}</td>
+            <td>${d.model}</td>
+            <td>${d.trim || ''}</td>
+            <td>${d.year}</td>
+            <td>${d.date}</td>
+            <td class="text-center"><span class="px-2 py-0.5 text-xs rounded-full font-medium ${badgeStyle}">${days}</span></td>
+            <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)" title="Double-click to view full text">${descriptionText.split('\n')[0]}</td>
+            <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)" title="Double-click to view full text">${d.comment || ''}</td>
+            <td><div class="flex items-center justify-center space-x-1">
+                <button onclick="openDescriptionModal('${doc.id}')" class="btn btn-secondary text-xs">Features</button>
+                <button onclick="openAIDescriptionModal('${doc.id}')" class="btn btn-primary text-xs">AI Desc</button>
+                <button onclick="openCompleteModal('${doc.id}')" class="btn btn-success text-xs">Complete</button>
+                <button onclick="openEditModal('${doc.id}', 'pending_vehicles')" class="btn btn-warning text-xs">Edit</button>
+                <button onclick="deleteEntry('${doc.id}', 'pending_vehicles')" class="btn btn-danger text-xs">Del</button>
+            </div></td></tr>`;
+    };
+    
+    const createCompletedRow = doc => {
+        const d = doc.data;
+        const stockClass = (d.photoType === 'HP' && calculateDays(d.date) > 7) ? (calculateDays(d.date) > 14 ? 'bg-red-100' : 'bg-amber-100') : '';
+        const detailedIcon = d.detailed === 'Yes'
+            ? `<span class="text-green-500 font-bold text-lg">✓</span>`
+            : `<span class="text-red-500 font-bold text-lg">✗</span>`;
+        
+        let descriptionText = d.generatedDescription || '';
+        if (!descriptionText) {
+            const features = d.descriptionFeatures || {};
+            const descriptionItems = [];
+            if (features.leatherSeats) descriptionItems.push('Leather Seats');
+            if (features.sunroof) descriptionItems.push('Sunroof');
+            if (features.heatedSteering) descriptionItems.push('Heated Steering');
+            if (features.heatedSeats) descriptionItems.push('Heated Seats');
+            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
+            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
+            if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
+            if (features.other) {
+                features.other.split('\n').forEach(f => {
+                    if (f.trim()) descriptionItems.push(f.trim());
+                });
+            }
+            descriptionText = descriptionItems.join(' | ');
+        }
+        
+        const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
+        const escapedComment = (d.comment || '').replace(/`/g, '\\`');
+        const escapedHalfReason = (d.halfReason || '').replace(/`/g, '\\`');
+
+        let recaptureClass = '';
+        if (d.recaptureNeeded === 'Yes' && calculateDays(d.date) > 5) {
+            recaptureClass = 'bg-red-100 text-red-700 font-bold';
+        }
+
+        return `<tr class="${d.isSold ? 'opacity-50' : ''}">
+            <td class="font-semibold text-gray-900 ${stockClass}">${d.vinOrStock || d.stock || ''}</td>
+            <td>${d.make}</td>
+            <td>${d.model}</td>
+            <td>${d.trim || ''}</td>
+            <td>${d.year}</td>
+            <td>${d.mileage || ''}</td>
+            <td>${d.date}</td>
+            <td class="text-center">${detailedIcon}</td>
+            <td>${d.photoType || ''}</td>
+            <td class="${recaptureClass}">${d.recaptureNeeded || 'No'}</td>
+            <td class="text-gray-500 truncate cursor-pointer" ondblclick="openViewDescriptionModal('Half Photo Reason', \`${escapedHalfReason}\`)" title="Double-click to view full text">${d.halfReason || ''}</td>
+            <td class="text-center">${calculateDays(d.originalEntryDate || d.date)}</td>
+            <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)">${descriptionText.split('\n')[0]}</td>
+            <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)" title="Double-click to view full text">${d.comment || ''}</td>
+            <td><div class="flex items-center justify-center space-x-1">
+                <button onclick="moveToPending('${doc.id}')" class="btn btn-secondary text-xs">Recapture</button>
+                <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-secondary' : 'btn-success'} text-xs">Sold</button>
+                <button onclick="openEditModal('${doc.id}', 'vehicles')" class="btn btn-warning text-xs">Edit</button>
+                <button onclick="deleteEntry('${doc.id}', 'vehicles')" class="btn btn-danger text-xs">Del</button>
+            </div></td></tr>`;
+    };
+
+    function renderDailySummary(page = 0) {
+        const today = getTodayDate();
+        document.getElementById('reportDate').textContent = getDisplayDate(today);
+        
+        let dailyEntries = completedData.filter(doc => doc.data.date === today);
+        dailyEntries.sort((a,b) => (b.data.completedAt?.toMillis() || 0) - (a.data.completedAt?.toMillis() || 0));
+
+        const paginationContainer = document.getElementById('dailySummaryPagination');
+        const noEntriesMsg = document.getElementById('noDailyEntries');
+        const contentContainer = document.getElementById('dailySummaryContent');
+        
+        if (dailyEntries.length === 0) {
+            contentContainer.classList.add('hidden');
+            noEntriesMsg.classList.remove('hidden');
+            paginationContainer.classList.add('hidden');
+            return;
+        }
+
+        contentContainer.classList.remove('hidden');
+        noEntriesMsg.classList.add('hidden');
+
+        const totalItems = dailyEntries.length;
+        const totalPages = Math.ceil(totalItems / DAILY_SUMMARY_PAGE_SIZE) || 1;
+        page = Math.max(0, Math.min(page, totalPages - 1));
+        currentDailySummaryPage = page;
+        
+        const pageSlice = dailyEntries.slice(page * DAILY_SUMMARY_PAGE_SIZE, (page * DAILY_SUMMARY_PAGE_SIZE) + DAILY_SUMMARY_PAGE_SIZE);
+        
+        const tbody = document.getElementById('dailySummaryTable');
+        tbody.innerHTML = pageSlice.map(doc => {
+            const d = doc.data;
+            const toggleButton = (field, value) => `<button onclick="toggleSummaryStatus('${doc.id}', '${field}', ${!!value})" class="btn ${value ? 'btn-success' : 'btn-secondary'} text-xs">${value ? 'Yes' : 'No'}</button>`;
+            const detailedIcon = d.detailed === 'Yes'
+                ? `<span class="text-green-500 font-bold text-lg">✓</span>`
+                : `<span class="text-red-500 font-bold text-lg">✗</span>`;
+            
+            let descriptionText = d.generatedDescription || '';
+            if (!descriptionText) {
+                const features = d.descriptionFeatures || {};
+                const descriptionItems = [];
+                if (features.leatherSeats) descriptionItems.push('Leather Seats');
+                if (features.sunroof) descriptionItems.push('Sunroof');
+                if (features.heatedSteering) descriptionItems.push('Heated Steering');
+                if (features.heatedSeats) descriptionItems.push('Heated Seats');
+                if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
+                if (features.premiumSound) descriptionItems.push('Premium Sound');
+                if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+                if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
+                if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
+                if (features.other) {
+                    features.other.split('\n').forEach(f => {
+                        if (f.trim()) descriptionItems.push(f.trim());
+                    });
+                }
+                descriptionText = descriptionItems.join(' | ');
+            }
+            
+            const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
+            const escapedComment = (d.comment || '').replace(/`/g, '\\`');
+
+            return `<tr>
+                <td class="font-semibold text-gray-900">${d.vinOrStock || d.stock || ''}</td>
+                <td>${d.make}</td>
+                <td>${d.model}</td>
+                <td>${d.trim || ''}</td>
+                <td>${d.year}</td>
+                <td>${d.mileage || ''}</td>
+                <td class="text-center">${detailedIcon}</td>
+                <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)">${descriptionText.split('\n')[0]}</td>
+                <td class="text-center">${toggleButton('descriptionUploaded', d.descriptionUploaded)}</td>
+                <td class="text-center">${toggleButton('gloveboxDocuments', d.gloveboxDocuments)}</td>
+                <td class="text-center">${toggleButton('recaptured', d.recaptured)}</td>
+                <td>${d.photoType}</td>
+                <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)">${d.comment || ''}</td>
+                <td class="text-center"><div class="flex items-center justify-center space-x-1">
+                    <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-secondary' : 'btn-success'} text-xs">Sold</button>
+                    <button onclick="openEditModal('${doc.id}', 'vehicles')" class="btn btn-warning text-xs">Edit</button>
+                    <button onclick="deleteEntry('${doc.id}', 'vehicles')" class="btn btn-danger text-xs">Del</button>
+                </div></td>
+            </tr>`;
+        }).join('');
+
+        if (totalPages > 1) {
+            paginationContainer.classList.remove('hidden');
+            document.getElementById(`dailySummaryPageInfo`).textContent = `Page ${page + 1} of ${totalPages}`;
+            document.getElementById(`dailySummaryPrevBtn`).disabled = page === 0;
+            document.getElementById(`dailySummaryNextBtn`).disabled = page >= totalPages - 1;
+        } else {
+            paginationContainer.classList.add('hidden');
+        }
+    }
+
+    // ==========================
+    // ACTIONS
+    // ==========================
+    async function addPending() {
+        const formData = {
+            vinOrStock: document.getElementById('vinOrStock').value.trim().toUpperCase(),
+            make: capitalizeFirst(document.getElementById('make').value.trim()),
+            model: capitalizeFirst(document.getElementById('model').value.trim()),
+            trim: document.getElementById('trim').value.trim(),
+            year: document.getElementById('year').value,
+            date: document.getElementById('date').value,
+            comment: document.getElementById('comment').value.trim()
+        };
+        if (!formData.vinOrStock || !formData.make || !formData.model || !formData.year || !formData.date) return showToast('Please fill all required fields.');
+        if (pendingData.some(item => (item.data.vinOrStock || item.data.stock) === formData.vinOrStock)) return showToast('Duplicate Stock/VIN in Pending list.');
+        
+        showSpinner();
+        try {
+            await db.collection('pending_vehicles').add(formData);
+            showToast('Vehicle added successfully!');
+            document.getElementById('dataEntryForm').reset();
+            document.getElementById('date').value = getTodayDate();
+        } catch (e) { console.error(e); showToast('Error adding entry.'); } finally { hideSpinner(); }
+    }
+    
+    async function confirmComplete() {
+        const isNotCleaned = document.getElementById('halfReasonNotCleaned').checked;
+        const isDamaged = document.getElementById('halfReasonDamage').checked;
+        let halfReasons = [];
+        if (isNotCleaned) halfReasons.push("Awaiting Detailing");
+        if (isDamaged) halfReasons.push("Exterior Damage");
+        const halfReasonText = halfReasons.join(', ');
+
+        const getSelectedValue = (groupName) => {
+            const activeButton = document.querySelector(`#${groupName}-toggle .btn.active`);
+            return activeButton ? activeButton.dataset.value : '';
+        };
+
+        const completeData = {
+            mileage: document.getElementById('mileage').value.trim(),
+            detailed: getSelectedValue('detailed'),
+            photoType: getSelectedValue('photos'),
+            halfReason: halfReasonText,
+            recaptureNeeded: getSelectedValue('recapture'),
+            recaptureComment: document.getElementById('recaptureComment').value.trim()
+        };
+        if (!completeData.detailed || !completeData.photoType || !completeData.recaptureNeeded) return showToast('Please fill out all fields.');
+        if (completeData.photoType === 'HP' && !completeData.halfReason) return showToast('A reason for half photos is required.');
+
+        showSpinner();
+        try {
+            const docRef = db.collection('pending_vehicles').doc(currentEdit.id);
+            const doc = await docRef.get();
+            if (doc.exists) {
+                await db.collection('vehicles').add({
+                    ...doc.data(), ...completeData, originalEntryDate: doc.data().date, date: getTodayDate(),
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    recaptured: false, descriptionUploaded: false, gloveboxDocuments: false, isSold: false
+                });
+                await docRef.delete();
+                showToast('Vehicle marked as complete!');
+                closeCompleteModal();
+            }
+        } catch (e) { console.error(e); showToast('Error completing vehicle.'); } finally { hideSpinner(); }
+    }
+
+    function openCompleteModal(id) {
+        currentEdit.id = id;
+        document.getElementById('mileage').value = '';
+        document.querySelectorAll('.btn-toggle-group .btn').forEach(button => {
+            button.classList.remove('active', 'btn-primary');
+            button.classList.add('btn-secondary');
+        });
+        document.getElementById('halfReasonNotCleaned').checked = false;
+        document.getElementById('halfReasonDamage').checked = false;
+        document.getElementById('recaptureComment').value = '';
+        document.getElementById('halfReasonContainer').classList.add('hidden');
+        document.getElementById('recaptureCommentContainer').classList.add('hidden');
+        document.getElementById('completeModal').classList.remove('hidden');
+    }
+
+    async function openDescriptionModal(id) {
+        currentEdit.id = id;
+        showSpinner();
+        try {
+            const doc = await db.collection('pending_vehicles').doc(id).get();
+            currentEdit.data = doc.data();
+            const features = currentEdit.data.descriptionFeatures || {};
+            document.getElementById('descLeatherSeats').checked = !!features.leatherSeats;
+            document.getElementById('descSunroof').checked = !!features.sunroof;
+            document.getElementById('descHeatedSteering').checked = !!features.heatedSteering;
+            document.getElementById('descHeatedSeats').checked = !!features.heatedSeats;
+            document.getElementById('descVentilatedSeats').checked = !!features.ventilatedSeats;
+            document.getElementById('descPremiumSound').checked = !!features.premiumSound;
+            document.getElementById('descInbuiltNav').checked = !!features.inbuiltNav;
+            document.getElementById('descWirelessCharger').checked = !!features.wirelessCharger;
+            document.getElementById('descCarplay').checked = !!features.carplay;
+            document.getElementById('descriptionModal').classList.remove('hidden');
+        } catch(e) { console.error(e); showToast('Error fetching description.'); } finally { hideSpinner(); }
+    }
+
+    async function saveDescription() {
+        const descriptionFeatures = {
+            leatherSeats: document.getElementById('descLeatherSeats').checked,
+            sunroof: document.getElementById('descSunroof').checked,
+            heatedSteering: document.getElementById('descHeatedSteering').checked,
+            heatedSeats: document.getElementById('descHeatedSeats').checked,
+            ventilatedSeats: document.getElementById('descVentilatedSeats').checked,
+            premiumSound: document.getElementById('descPremiumSound').checked,
+            inbuiltNav: document.getElementById('descInbuiltNav').checked,
+            wirelessCharger: document.getElementById('descWirelessCharger').checked,
+            carplay: document.getElementById('descCarplay').checked,
+        };
+        showSpinner();
+        try {
+            await db.collection('pending_vehicles').doc(currentEdit.id).update({ descriptionFeatures });
+            showToast('Description features saved!');
+            closeDescriptionModal();
+        } catch (e) { console.error(e); showToast('Error saving description.'); } finally { hideSpinner(); }
+    }
+    
+    function openEditModal(id, collection) {
+        currentEdit.id = id;
+        currentEdit.collection = collection;
+        showSpinner();
+        db.collection(collection).doc(id).get().then(doc => {
+            if(doc.exists) {
+                const d = doc.data();
+                currentEdit.data = d;
+                
+                document.getElementById('editVinOrStock').value = d.vinOrStock || d.stock || '';
+                document.getElementById('editMake').value = d.make || '';
+                document.getElementById('editModel').value = d.model || '';
+                document.getElementById('editTrim').value = d.trim || '';
+                document.getElementById('editYear').value = d.year || '';
+                document.getElementById('editDate').value = d.date || '';
+                document.getElementById('editComment').value = d.comment || '';
+                document.getElementById('editGeneratedDescription').value = d.generatedDescription || '';
+                document.getElementById('editMileage').value = d.mileage || '';
+
+                const features = d.descriptionFeatures || {};
+                document.getElementById('editLeatherSeats').checked = !!features.leatherSeats;
+                document.getElementById('editSunroof').checked = !!features.sunroof;
+                document.getElementById('editHeatedSteering').checked = !!features.heatedSteering;
+                document.getElementById('editHeatedSeats').checked = !!features.heatedSeats;
+                document.getElementById('editVentilatedSeats').checked = !!features.ventilatedSeats;
+                document.getElementById('editPremiumSound').checked = !!features.premiumSound;
+                document.getElementById('editInbuiltNav').checked = !!features.inbuiltNav;
+                document.getElementById('editWirelessCharger').checked = !!features.wirelessCharger;
+                document.getElementById('editCarplay').checked = !!features.carplay;
+                document.getElementById('editOtherFeatures').value = features.other || '';
+
+                const mileageEl = document.getElementById('editMileage');
+                if(collection === 'vehicles') {
+                    mileageEl.classList.remove('hidden');
+                } else {
+                     mileageEl.classList.add('hidden');
+                }
+                document.getElementById('editModal').classList.remove('hidden');
+            }
+        }).catch(e => { console.error(e); showToast('Error fetching document.'); }).finally(hideSpinner);
+    }
+    
+    async function deleteEntry(id, collection) {
+        openConfirmModal('Are you sure you want to permanently delete this entry?', async () => {
+            showSpinner();
+            try {
+                await db.collection(collection).doc(id).delete();
+                showToast('Entry deleted!');
+            } catch(e) { console.error(e); showToast('Error deleting entry.'); } finally { hideSpinner(); }
+        });
+    }
+
+    async function toggleSummaryStatus(id, field, currentValue) {
+        showSpinner();
+        try {
+            await db.collection('vehicles').doc(id).update({ [field]: !currentValue });
+            showToast('Status updated.');
+        } catch (e) { console.error(e); showToast('Error updating status.'); } finally { hideSpinner(); }
+    }
+
+    async function toggleSoldStatus(id, currentValue) {
+        showSpinner();
+        try {
+            await db.collection('vehicles').doc(id).update({ isSold: !currentValue });
+            showToast(`Vehicle marked as ${!currentValue ? 'Sold' : 'Available'}.`);
+        } catch (e) { console.error(e); showToast('Error updating sold status.'); } finally { hideSpinner(); }
+    }
+
+    async function moveToPending(id) {
+        openConfirmModal('Are you sure you want to move this vehicle back to the Pending list for recapture?', async () => {
+            showSpinner();
+            try {
+                const docRef = db.collection('vehicles').doc(id);
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    const pendingData = {
+                        vinOrStock: data.vinOrStock || data.stock || '',
+                        make: data.make,
+                        model: data.model,
+                        trim: data.trim,
+                        year: data.year,
+                        date: getTodayDate(), // Reset date to today
+                        comment: `Moved back for recapture. Original comment: ${data.comment || ''}`, // Pre-fill a comment
+                        descriptionFeatures: data.descriptionFeatures || {},
+                        generatedDescription: data.generatedDescription || ''
+                    };
+                    await db.collection('pending_vehicles').add(pendingData);
+                    await docRef.delete();
+                    showToast('Vehicle moved to Pending for recapture.');
+                }
+            } catch(e) {
+                console.error(e);
+                showToast('Error moving vehicle.');
+            } finally {
+                hideSpinner();
+            }
+        });
+    }
+
+
+    // =================================
+    // AI DESCRIPTION FUNCTIONS
+    // =================================
+    async function openAIDescriptionModal(id) {
+        showSpinner();
+        try {
+            const doc = await db.collection('pending_vehicles').doc(id).get();
+            if (!doc.exists) {
+                showToast("Vehicle not found.");
+                return;
+            }
+            currentEdit.id = id;
+            currentEdit.data = doc.data();
+            currentEdit.collection = 'pending_vehicles';
+
+            const d = currentEdit.data;
+            document.getElementById('aiVehicleInfo').innerText = `${d.year} ${d.make} ${d.model} ${d.trim || ''}`;
+            
+            const features = d.descriptionFeatures || {};
+            const descriptionItems = [];
+            if (features.leatherSeats) descriptionItems.push('Leather Seats');
+            if (features.sunroof) descriptionItems.push('Sunroof');
+            if (features.heatedSteering) descriptionItems.push('Heated Steering');
+            if (features.heatedSeats) descriptionItems.push('Heated Seats');
+            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
+            if (features.premiumSound) descriptionItems.push('Premium Sound');
+            if (features.inbuiltNav) descriptionItems.push('Inbuilt Navigation');
+            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
+            if (features.carplay) descriptionItems.push('Apple CarPlay & Android Auto');
+            if (features.other) {
+                features.other.split('\n').forEach(f => {
+                    if (f.trim()) descriptionItems.push(f.trim());
+                });
+            }
+            document.getElementById('aiFeaturesList').innerText = descriptionItems.length ? descriptionItems.join(', ') : 'No special features selected.';
+            
+            document.getElementById('aiGeneratedText').value = d.generatedDescription || '';
+            
+            document.getElementById('generateDescriptionModal').classList.remove('hidden');
+        } catch (e) {
+            console.error("Error opening AI modal:", e);
+            showToast("Could not load vehicle data.");
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    async function generateDescription() {
+        const aiSpinner = document.getElementById('aiSpinner');
+        aiSpinner.classList.remove('hidden');
+        document.getElementById('aiGeneratedText').value = '';
+
+        const vehicle = currentEdit.data;
+        if (!vehicle) {
+            showToast("Error: No vehicle data loaded.");
+            aiSpinner.classList.add('hidden');
+            return;
+        }
+
+        const features = vehicle.descriptionFeatures || {};
+        const featureList = Object.entries(features)
+            .filter(([key, value]) => value && key !== 'other')
+            .map(([key]) => {
+                if (key === 'leatherSeats') return 'Leather Seats';
+                if (key === 'sunroof') return 'Sunroof';
+                if (key === 'heatedSteering') return 'Heated Steering';
+                if (key === 'heatedSeats') return 'Heated Seats';
+                if (key === 'ventilatedSeats') return 'Ventilated Seats';
+                if (key === 'premiumSound') return 'Premium Sound System';
+                if (key === 'inbuiltNav') return 'Inbuilt Navigation';
+                if (key === 'wirelessCharger') return 'Wireless Phone Charger';
+                if (key === 'carplay') return 'Apple CarPlay & Android Auto';
+                return '';
+            });
+        
+        if (features.other) {
+            features.other.split('\n').forEach(f => {
+                if(f.trim()) featureList.push(f.trim())
+            });
+        }
+
+        const customFormatInstructions = `
+    You must generate the description using this exact multi-part format, including all headers and footers. Do not deviate.
+
+    ###
+    **[Year] [Make] [Model] [Trim] – [Ownership Status, e.g., One Owner, Clean CarFax]**
+
+    [Engaging opening paragraph - 2-3 sentences max. Example: "Elevate your family journeys with the [Year] [Make] [Model] — a sophisticated SUV that blends premium comfort, safety, and technology in one striking package."]
+
+    **Key Features:**
+    - [Feature 1]
+    - [Feature 2]
+    - [Feature 3]
+    - [List 5-7 key technical and comfort features relevant to the vehicle. Use the provided "Additional Features" as a starting point.]
+
+    **Safety Highlights:**
+    - [Safety Feature 1]
+    - [Safety Feature 2]
+    - [List 3-4 key safety features for this model and year.]
+
+    **Ownership & Condition:**
+    - [List ownership details from the "Full Trim / Details" field, e.g., "One Owner", "Clean CarFax (No Accidents)". If none are provided, omit this section.]
+
+    **Why Buy from Thornhill Hyundai?**
+    At Thornhill Hyundai, we offer top-quality pre-owned vehicles with full transparency, ensuring you drive away with confidence.
+
+    **Please Note:**
+    HST and licensing fees are not included in the listing price. Prices and promotions are subject to change without notice. Contact us for the most up-to-date information.
+    ###
+        `;
+
+        const prompt = `
+            You are an expert car salesperson writing a compelling, professional, and enticing description for a dealership website.
+
+            **Primary Task:**
+            Generate a vehicle description that strictly follows the multi-part format provided in "Dealership's Required Format Instructions". You must identify the core trim and any ownership details (like "One Owner", "Clean CarFax") from the "Full Trim / Details" field to construct the title and the "Ownership & Condition" section.
+
+            **Vehicle Details:**
+            - Year: ${vehicle.year}
+            - Make: ${vehicle.make}
+            - Model: ${vehicle.model}
+            - Full Trim / Details: "${vehicle.trim || 'Standard'}" (This contains the trim name and may also contain ownership info).
+            - Additional Features: ${featureList.join(', ') || 'Standard features'}
+
+            **Context:**
+            - The current date is ${new Date().toDateString()}.
+            - The dealership is "Thornhill Hyundai" located in Vaughan, Ontario, Canada.
+
+            **Dealership's Required Format Instructions:**
+            ---
+            ${customFormatInstructions}
+            ---
+
+            Now, generate the complete description based on all the information and instructions provided.
+        `;
+
+        try {
+            // IMPORTANT: The API key is left blank as it's expected to be injected by the runtime environment.
+            // If this feature fails, it is likely due to the execution environment not providing a valid API key.
+            const apiKey = "";
+            const model = "gemini-2.0-flash";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error("API Error Response:", result);
+                const errorMsg = result.error?.message || `HTTP error! Status: ${response.status}`;
+                throw new Error(errorMsg);
+            }
+
+            if (result.candidates && result.candidates.length > 0) {
+                const candidate = result.candidates[0];
+                if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                    const generatedText = candidate.content.parts[0].text;
+                    document.getElementById('aiGeneratedText').value = generatedText;
+                } else {
+                    const finishReason = candidate.finishReason || 'UNKNOWN';
+                    const safetyRatings = JSON.stringify(candidate.safetyRatings) || 'Not available';
+                    console.error(`API response missing content. Finish Reason: ${finishReason}. Safety Ratings: ${safetyRatings}`);
+                    throw new Error(`Generation failed. The AI response was empty. Reason: ${finishReason}.`);
+                }
+            } else {
+                console.error("Invalid API response structure:", result);
+                throw new Error("No response candidates found from the AI service.");
+            }
+        } catch (error) {
+            console.error('Error in generateDescription:', error);
+            showToast(`Error: ${error.message}. Check console for details.`);
+        } finally {
+            aiSpinner.classList.add('hidden');
+        }
+    }
+
+    async function saveAIDescription() {
+        const newDescription = document.getElementById('aiGeneratedText').value;
+        if (!newDescription.trim()) {
+            showToast("Description cannot be empty.");
+            return;
+        }
+        showSpinner();
+        try {
+            await db.collection(currentEdit.collection).doc(currentEdit.id).update({
+                generatedDescription: newDescription
+            });
+            showToast("AI description saved successfully!");
+            closeAIDescriptionModal();
+        } catch (e) {
+            console.error("Error saving AI description:", e);
+            showToast("Could not save the description.");
+        } finally {
+            hideSpinner();
+        }
+    }
+
+
+    // ==========================
+    // INITIALIZATION & LISTENERS
+    // ==========================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Populate year dropdowns
+        const currentYear = new Date().getFullYear();
+        document.querySelectorAll('#year, #editYear').forEach(sel => {
+            for (let y = currentYear + 1; y >= 2000; y--) sel.append(new Option(y, y));
+        });
+        document.getElementById('date').value = getTodayDate();
+        setupSorting();
+
+        // Firebase Listeners
+        db.collection('pending_vehicles').onSnapshot(snapshot => {
+            pendingData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+            renderTable('pending', 'pendingTable', pendingData, currentPendingPage, PENDING_PAGE_SIZE, createPendingRow, 'No pending vehicles.');
+        }, err => { console.error(err); showToast('Error loading pending vehicles.'); });
+
+        db.collection('vehicles').onSnapshot(snapshot => {
+            completedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+            document.getElementById('searchCompleted').dispatchEvent(new Event('input'));
+            renderDailySummary();
+        }, err => { console.error(err); showToast('Error loading completed vehicles.'); });
+        
+        // Event Listeners
+        document.getElementById('searchCompleted').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase();
+            filteredCompletedData = completedData.filter(item => {
+                const d = item.data;
+                const searchableString = Object.values(d).join(' ').toLowerCase();
+                const stockOrVin = (d.vinOrStock || d.stock || '').toLowerCase();
+                return searchableString.includes(term) || stockOrVin.includes(term);
+            });
+            renderTable('completed', 'completedTable', filteredCompletedData, 0, COMPLETED_PAGE_SIZE, createCompletedRow, 'No results found.');
+        });
+        
+        document.getElementById('saveEditBtn').addEventListener('click', async () => {
+            const id = currentEdit.id;
+            const collection = currentEdit.collection;
+            
+            const descriptionFeatures = {
+                leatherSeats: document.getElementById('editLeatherSeats').checked,
+                sunroof: document.getElementById('editSunroof').checked,
+                heatedSteering: document.getElementById('editHeatedSteering').checked,
+                heatedSeats: document.getElementById('editHeatedSeats').checked,
+                ventilatedSeats: document.getElementById('editVentilatedSeats').checked,
+                premiumSound: document.getElementById('editPremiumSound').checked,
+                inbuiltNav: document.getElementById('editInbuiltNav').checked,
+                wirelessCharger: document.getElementById('editWirelessCharger').checked,
+                carplay: document.getElementById('editCarplay').checked,
+                other: document.getElementById('editOtherFeatures').value.trim(),
+            };
+
+            const data = {
+                vinOrStock: document.getElementById('editVinOrStock').value.trim().toUpperCase(),
+                make: capitalizeFirst(document.getElementById('editMake').value.trim()),
+                model: capitalizeFirst(document.getElementById('editModel').value.trim()),
+                trim: document.getElementById('editTrim').value.trim(),
+                year: document.getElementById('editYear').value,
+                date: document.getElementById('editDate').value,
+                comment: document.getElementById('editComment').value,
+                generatedDescription: document.getElementById('editGeneratedDescription').value,
+                descriptionFeatures: descriptionFeatures,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (collection === 'vehicles') {
+                data.mileage = document.getElementById('editMileage').value.trim();
+            }
+
+            showSpinner();
+            try {
+                await db.collection(collection).doc(id).update(data);
+                showToast('Changes saved!');
+                closeModal();
+            } catch (e) { console.error(e); showToast('Error saving changes.'); } finally { hideSpinner(); }
+        });
+        
+        document.querySelectorAll('.btn-toggle-group .btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const group = button.dataset.group;
+                document.querySelectorAll(`[data-group="${group}"]`).forEach(btn => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-secondary');
+                });
+                button.classList.add('active', 'btn-primary');
+                button.classList.remove('btn-secondary');
+
+                if (group === 'photos') {
+                    document.getElementById('halfReasonContainer').classList.toggle('hidden', button.dataset.value !== 'HP');
+                }
+                if (group === 'recapture') {
+                    document.getElementById('recaptureCommentContainer').classList.toggle('hidden', button.dataset.value !== 'Yes');
+                }
+            });
+        });
+
+        document.getElementById('pendingPrevBtn').onclick = () => renderTable('pending', 'pendingTable', pendingData, currentPendingPage - 1, PENDING_PAGE_SIZE, createPendingRow, 'No pending vehicles.');
+        document.getElementById('pendingNextBtn').onclick = () => renderTable('pending', 'pendingTable', pendingData, currentPendingPage + 1, PENDING_PAGE_SIZE, createPendingRow, 'No pending vehicles.');
+        document.getElementById('completedPrevBtn').onclick = () => renderTable('completed', 'completedTable', filteredCompletedData, currentCompletedPage - 1, COMPLETED_PAGE_SIZE, createCompletedRow, 'No completed vehicles.');
+        document.getElementById('completedNextBtn').onclick = () => renderTable('completed', 'completedTable', filteredCompletedData, currentCompletedPage + 1, COMPLETED_PAGE_SIZE, createCompletedRow, 'No completed vehicles.');
+        document.getElementById('dailySummaryPrevBtn').onclick = () => renderDailySummary(currentDailySummaryPage - 1);
+        document.getElementById('dailySummaryNextBtn').onclick = () => renderDailySummary(currentDailySummaryPage + 1);
+        
+        document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+        document.getElementById('confirmOkBtn').addEventListener('click', () => {
+            if (typeof onConfirmCallback === 'function') {
+                onConfirmCallback();
+            }
+            closeConfirmModal();
+        });
+    });
+
+    function setupSorting() {
+        document.querySelectorAll('th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const column = th.dataset.col;
+                const tableKey = th.closest('table').querySelector('tbody').id.includes('pending') ? 'pending' : 'completed';
+                
+                if (sortState[tableKey].col === column) {
+                    sortState[tableKey].dir = sortState[tableKey].dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortState[tableKey].col = column;
+                    sortState[tableKey].dir = 'asc';
+                }
+
+                document.querySelectorAll(`#${tableKey}Table th.sortable`).forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+                th.classList.add(sortState[tableKey].dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                
+                if (tableKey === 'pending') {
+                    renderTable('pending', 'pendingTable', pendingData, currentPendingPage, PENDING_PAGE_SIZE, createPendingRow, 'No pending vehicles.');
+                } else {
+                    renderTable('completed', 'completedTable', filteredCompletedData, currentCompletedPage, COMPLETED_PAGE_SIZE, createCompletedRow, 'No completed vehicles.');
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>
+
