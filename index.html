@@ -167,18 +167,21 @@
     </header>
 
     <main class="px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <div id="recaptureAlert" class="hidden bg-red-100 border border-red-400 text-red-700 text-sm rounded-md"></div>
 
         <section class="card p-6">
             <h2 class="text-lg font-semibold mb-4">Data Entry</h2>
-            <form id="dataEntryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+            <form id="dataEntryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
                 <input id="vinOrStock" placeholder="VIN or Stock No." class="form-input" />
                 <input id="make" placeholder="Make" class="form-input" />
                 <input id="model" placeholder="Model" class="form-input" />
                 <input id="trim" placeholder="Trim" class="form-input" />
                 <select id="year" class="form-input"><option value="">Year</option></select>
+                <input id="mileage" placeholder="Mileage" class="form-input font-bold" />
                 <input id="date" type="date" class="form-input" />
-                <input id="comment" placeholder="Comment (Optional)" class="form-input col-span-full md:col-span-2" />
-                <div class="sm:col-span-2 md:col-span-5 text-right mt-2 flex justify-end space-x-2">
+                <input id="comment" placeholder="Comment (Optional)" class="form-input col-span-full md:col-span-3" />
+                <div class="sm:col-span-2 md:col-span-6 text-right mt-2 flex justify-end space-x-2">
                     <button type="button" id="undoBtn" onclick="undoLastEntry()" class="btn btn-danger disabled:opacity-50" disabled>Undo Last Operation</button>
                     <button type="button" onclick="addPending()" class="btn btn-primary">Add to Pending</button>
                 </div>
@@ -246,6 +249,7 @@
                             <th data-col="days" class="sortable text-center">Days</th>
                             <th>Description</th>
                             <th>Comment</th>
+                            <th>Link</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -281,7 +285,7 @@
                                 <th class="text-center">Glovebox</th>
                                 <th class="text-center">Recaptured</th>
                                 <th>Photos</th>
-                                <th>Comment</th>
+                                <th>Links</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -305,7 +309,6 @@
         <div class="modal-card w-full max-w-md p-6">
             <h3 class="text-lg font-semibold mb-4">Complete Vehicle</h3>
             <div class="space-y-4">
-                <input id="mileage" placeholder="Mileage" class="form-input" />
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Detailed?</label>
                     <div id="detailed-toggle" class="mt-1 grid grid-cols-2 gap-2 btn-toggle-group">
@@ -359,12 +362,14 @@
             <h3 class="text-lg font-semibold mb-4">Vehicle Description Features</h3>
             <div class="grid grid-cols-2 gap-3">
                 <div class="flex items-center"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
+                <div class="flex items-center"><input id="descBlindSpot" type="checkbox" class="form-checkbox mr-3"><label for="descBlindSpot">Blind Spot Monitoring</label></div>
                 <div class="flex items-center"><input id="descBluetooth" type="checkbox" class="form-checkbox mr-3"><label for="descBluetooth">Bluetooth</label></div>
                 <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
                 <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
                 <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Navigation System</label></div>
                 <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
                 <div class="flex items-center"><input id="descMultiZoneClimate" type="checkbox" class="form-checkbox mr-3"><label for="descMultiZoneClimate">Multi Zone Climate</label></div>
+                <div class="flex items-center"><input id="descParkingSensors" type="checkbox" class="form-checkbox mr-3"><label for="descParkingSensors">Parking Sensors</label></div>
                 <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
                 <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof/Moonroof</label></div>
                 <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
@@ -435,19 +440,22 @@
                 <input id="editTrim" placeholder="Trim" class="form-input" />
                 <select id="editYear" class="form-input"><option value="">Year</option></select>
                 <input id="editDate" type="date" class="form-input" />
-                <input id="editMileage" placeholder="Mileage" class="form-input hidden" />
+                <input id="editMileage" placeholder="Mileage" class="form-input" />
+                <input id="editLink" placeholder="Website Link" class="form-input sm:col-span-2" />
              </div>
              <div class="space-y-4">
                 <div class="border rounded-md p-4">
                     <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
                     <div class="grid grid-cols-2 gap-2">
                         <div class="flex items-center"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
+                        <div class="flex items-center"><input id="editBlindSpot" type="checkbox" class="form-checkbox mr-2"><label for="editBlindSpot" class="text-sm">Blind Spot Monitoring</label></div>
                         <div class="flex items-center"><input id="editBluetooth" type="checkbox" class="form-checkbox mr-2"><label for="editBluetooth" class="text-sm">Bluetooth</label></div>
                         <div class="flex items-center"><input id="editHeatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSeats" class="text-sm">Heated Seats</label></div>
                         <div class="flex items-center"><input id="editHeatedSteering" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSteering" class="text-sm">Heated Steering</label></div>
                         <div class="flex items-center"><input id="editInbuiltNav" type="checkbox" class="form-checkbox mr-2"><label for="editInbuiltNav" class="text-sm">Navigation System</label></div>
                         <div class="flex items-center"><input id="editLeatherSeats" type="checkbox" class="form-checkbox mr-2"><label for="editLeatherSeats" class="text-sm">Leather Seats</label></div>
                         <div class="flex items-center"><input id="editMultiZoneClimate" type="checkbox" class="form-checkbox mr-2"><label for="editMultiZoneClimate" class="text-sm">Multi Zone Climate</label></div>
+                        <div class="flex items-center"><input id="editParkingSensors" type="checkbox" class="form-checkbox mr-2"><label for="editParkingSensors" class="text-sm">Parking Sensors</label></div>
                         <div class="flex items-center"><input id="editPremiumSound" type="checkbox" class="form-checkbox mr-2"><label for="editPremiumSound" class="text-sm">Premium Sound</label></div>
                         <div class="flex items-center"><input id="editSunroof" type="checkbox" class="form-checkbox mr-2"><label for="editSunroof" class="text-sm">Sunroof/Moonroof</label></div>
                         <div class="flex items-center"><input id="editVentilatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editVentilatedSeats" class="text-sm">Ventilated Seats</label></div>
@@ -593,39 +601,41 @@
         if (key === 'pending') currentPendingPage = page; else currentCompletedPage = page;
         
         const pageSlice = sorted.slice(page * size, (page * size) + size);
-        tbody.innerHTML = pageSlice.length ? pageSlice.map(rowFunc).join('') : `<tr><td colspan="15" class="text-center py-10 text-gray-500">${emptyMsg}</td></tr>`;
+        tbody.innerHTML = pageSlice.length ? pageSlice.map(rowFunc).join('') : `<tr><td colspan="16" class="text-center py-10 text-gray-500">${emptyMsg}</td></tr>`;
         
         document.getElementById(`${key}PageInfo`).textContent = `Page ${page + 1} of ${totalPages}`;
         document.getElementById(`${key}PrevBtn`).disabled = page === 0;
         document.getElementById(`${key}NextBtn`).disabled = page >= totalPages - 1;
     }
 
+    function getFeaturesText(features) {
+        const descriptionItems = [];
+        if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
+        if (features.blindSpot) descriptionItems.push('Blind Spot Monitoring');
+        if (features.bluetooth) descriptionItems.push('Bluetooth');
+        if (features.heatedSeats) descriptionItems.push('Heated Seats');
+        if (features.heatedSteering) descriptionItems.push('Heated Steering');
+        if (features.inbuiltNav) descriptionItems.push('Navigation System');
+        if (features.leatherSeats) descriptionItems.push('Leather Seats');
+        if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
+        if (features.parkingSensors) descriptionItems.push('Parking Sensors');
+        if (features.premiumSound) descriptionItems.push('Premium Sound');
+        if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
+        if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
+        if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
+        if (features.other) {
+            features.other.split('\n').forEach(f => {
+                if (f.trim()) descriptionItems.push(f.trim());
+            });
+        }
+        return descriptionItems.join(' | ');
+    }
+
     const createPendingRow = doc => {
         const d = doc.data, days = calculateDays(d.date);
         const badgeStyle = days > 3 ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100';
         
-        let descriptionText = d.generatedDescription || '';
-        if (!descriptionText) {
-            const features = d.descriptionFeatures || {};
-            const descriptionItems = [];
-            if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
-            if(features.bluetooth) descriptionItems.push('Bluetooth');
-            if (features.heatedSeats) descriptionItems.push('Heated Seats');
-            if (features.heatedSteering) descriptionItems.push('Heated Steering');
-            if (features.inbuiltNav) descriptionItems.push('Navigation System');
-            if (features.leatherSeats) descriptionItems.push('Leather Seats');
-            if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
-            if (features.premiumSound) descriptionItems.push('Premium Sound');
-            if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
-            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-            if (features.other) {
-                features.other.split('\n').forEach(f => {
-                    if (f.trim()) descriptionItems.push(f.trim());
-                });
-            }
-            descriptionText = descriptionItems.join(' | ');
-        }
+        let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
         
         const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
         const escapedComment = (d.comment || '').replace(/`/g, '\\`');
@@ -656,28 +666,7 @@
             ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
             : `<span class="text-red-500 font-bold text-lg">✗</span>`;
         
-        let descriptionText = d.generatedDescription || '';
-        if (!descriptionText) {
-            const features = d.descriptionFeatures || {};
-            const descriptionItems = [];
-            if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
-            if(features.bluetooth) descriptionItems.push('Bluetooth');
-            if (features.heatedSeats) descriptionItems.push('Heated Seats');
-            if (features.heatedSteering) descriptionItems.push('Heated Steering');
-            if (features.inbuiltNav) descriptionItems.push('Navigation System');
-            if (features.leatherSeats) descriptionItems.push('Leather Seats');
-            if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
-            if (features.premiumSound) descriptionItems.push('Premium Sound');
-            if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
-            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-            if (features.other) {
-                features.other.split('\n').forEach(f => {
-                    if (f.trim()) descriptionItems.push(f.trim());
-                });
-            }
-            descriptionText = descriptionItems.join(' | ');
-        }
+        let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
         
         const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
         const escapedComment = (d.comment || '').replace(/`/g, '\\`');
@@ -703,6 +692,7 @@
             <td class="text-center">${calculateDays(d.originalEntryDate || d.date)}</td>
             <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)" title="Double-click to view full text">${descriptionText.split('\n')[0]}</td>
             <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)" title="Double-click to view full text">${d.comment || ''}</td>
+            <td>${d.link ? `<a href="${d.link}" target="_blank" class="text-blue-600 hover:underline">THH</a>` : ''}</td>
             <td><div class="flex items-center justify-center space-x-1">
                 <button onclick="moveToPending('${doc.id}')" class="btn btn-secondary text-xs">Recapture</button>
                 <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-secondary' : 'btn-success'} text-xs">Sold</button>
@@ -747,31 +737,9 @@
                 ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
                 : `<span class="text-red-500 font-bold text-lg">✗</span>`;
             
-            let descriptionText = d.generatedDescription || '';
-            if (!descriptionText) {
-                const features = d.descriptionFeatures || {};
-                const descriptionItems = [];
-                if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
-                if(features.bluetooth) descriptionItems.push('Bluetooth');
-                if (features.heatedSeats) descriptionItems.push('Heated Seats');
-                if (features.heatedSteering) descriptionItems.push('Heated Steering');
-                if (features.inbuiltNav) descriptionItems.push('Navigation System');
-                if (features.leatherSeats) descriptionItems.push('Leather Seats');
-                if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
-                if (features.premiumSound) descriptionItems.push('Premium Sound');
-                if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
-                if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-                if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-                if (features.other) {
-                    features.other.split('\n').forEach(f => {
-                        if (f.trim()) descriptionItems.push(f.trim());
-                    });
-                }
-                descriptionText = descriptionItems.join(' | ');
-            }
+            let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
             
             const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
-            const escapedComment = (d.comment || '').replace(/`/g, '\\`');
 
             return `<tr>
                 <td class="font-semibold text-gray-900">${d.vinOrStock || d.stock || ''}</td>
@@ -786,7 +754,7 @@
                 <td class="text-center">${toggleButton('gloveboxDocuments', d.gloveboxDocuments)}</td>
                 <td class="text-center">${toggleButton('recaptured', d.recaptured)}</td>
                 <td>${d.photoType}</td>
-                <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)">${d.comment || ''}</td>
+                <td>${d.link ? `<a href="${d.link}" target="_blank" class="text-blue-600 hover:underline">THH</a>` : ''}</td>
                 <td class="text-center"><div class="flex items-center justify-center space-x-1">
                     <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-secondary' : 'btn-success'} text-xs">Sold</button>
                     <button onclick="openEditModal('${doc.id}', 'vehicles')" class="btn btn-warning text-xs">Edit</button>
@@ -805,6 +773,31 @@
         }
     }
 
+    function renderRecaptureAlerts() {
+        const alertContainer = document.getElementById('recaptureAlert');
+        const overdueRecaptures = completedData.filter(doc => {
+            const d = doc.data;
+            return d.recaptureNeeded === 'Yes' && calculateDays(d.date) > 7;
+        });
+
+        if (overdueRecaptures.length > 0) {
+            const alertHTML = overdueRecaptures.map(doc => {
+                const d = doc.data;
+                const daysOver = calculateDays(d.date);
+                return `<div class="p-2 border-b border-red-300 last:border-b-0">
+                            <strong>Stock:</strong> ${d.vinOrStock || d.stock} | 
+                            <strong>Make:</strong> ${d.make} | 
+                            <strong>Model:</strong> ${d.model} | 
+                            <strong>Days Overdue:</strong> ${daysOver}
+                        </div>`;
+            }).join('');
+            alertContainer.innerHTML = `<div class="font-bold p-2 border-b border-red-300">Recapture Required (Over 7 Days)</div>${alertHTML}`;
+            alertContainer.classList.remove('hidden');
+        } else {
+            alertContainer.classList.add('hidden');
+        }
+    }
+
     // ==========================
     // ACTIONS
     // ==========================
@@ -815,6 +808,7 @@
             model: capitalizeFirst(document.getElementById('model').value.trim()),
             trim: document.getElementById('trim').value.trim(),
             year: document.getElementById('year').value,
+            mileage: document.getElementById('mileage').value.trim(),
             date: document.getElementById('date').value,
             comment: document.getElementById('comment').value.trim(),
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -881,6 +875,7 @@
                 document.getElementById('trim').value = parsedData.trim;
                 document.getElementById('date').value = getTodayDate();
                 document.getElementById('comment').value = '';
+                document.getElementById('mileage').value = ''; // Mileage is not in bulk data
 
                 const docRef = await addPending(true);
                 if (docRef) {
@@ -974,7 +969,6 @@
         };
 
         const completeData = {
-            mileage: document.getElementById('mileage').value.trim(),
             detailed: getSelectedValue('detailed'),
             photoType: getSelectedValue('photos'),
             halfReason: halfReasonText,
@@ -1003,7 +997,6 @@
 
     function openCompleteModal(id) {
         currentEdit.id = id;
-        document.getElementById('mileage').value = '';
         document.querySelectorAll('.btn-toggle-group .btn').forEach(button => {
             button.classList.remove('active', 'btn-primary');
             button.classList.add('btn-secondary');
@@ -1024,12 +1017,14 @@
             currentEdit.data = doc.data();
             const features = currentEdit.data.descriptionFeatures || {};
             document.getElementById('descCarplay').checked = !!features.appleCarPlay;
+            document.getElementById('descBlindSpot').checked = !!features.blindSpot;
             document.getElementById('descBluetooth').checked = !!features.bluetooth;
             document.getElementById('descHeatedSeats').checked = !!features.heatedSeats;
             document.getElementById('descHeatedSteering').checked = !!features.heatedSteering;
             document.getElementById('descInbuiltNav').checked = !!features.inbuiltNav;
             document.getElementById('descLeatherSeats').checked = !!features.leatherSeats;
             document.getElementById('descMultiZoneClimate').checked = !!features.multiZoneClimate;
+            document.getElementById('descParkingSensors').checked = !!features.parkingSensors;
             document.getElementById('descPremiumSound').checked = !!features.premiumSound;
             document.getElementById('descSunroof').checked = !!features.sunroof;
             document.getElementById('descVentilatedSeats').checked = !!features.ventilatedSeats;
@@ -1041,12 +1036,14 @@
     async function saveDescription() {
         const descriptionFeatures = {
             appleCarPlay: document.getElementById('descCarplay').checked,
+            blindSpot: document.getElementById('descBlindSpot').checked,
             bluetooth: document.getElementById('descBluetooth').checked,
             heatedSeats: document.getElementById('descHeatedSeats').checked,
             heatedSteering: document.getElementById('descHeatedSteering').checked,
             inbuiltNav: document.getElementById('descInbuiltNav').checked,
             leatherSeats: document.getElementById('descLeatherSeats').checked,
             multiZoneClimate: document.getElementById('descMultiZoneClimate').checked,
+            parkingSensors: document.getElementById('descParkingSensors').checked,
             premiumSound: document.getElementById('descPremiumSound').checked,
             sunroof: document.getElementById('descSunroof').checked,
             ventilatedSeats: document.getElementById('descVentilatedSeats').checked,
@@ -1078,27 +1075,24 @@
                 document.getElementById('editComment').value = d.comment || '';
                 document.getElementById('editGeneratedDescription').value = d.generatedDescription || '';
                 document.getElementById('editMileage').value = d.mileage || '';
+                document.getElementById('editLink').value = d.link || '';
 
                 const features = d.descriptionFeatures || {};
                 document.getElementById('editCarplay').checked = !!features.appleCarPlay;
+                document.getElementById('editBlindSpot').checked = !!features.blindSpot;
                 document.getElementById('editBluetooth').checked = !!features.bluetooth;
                 document.getElementById('editHeatedSeats').checked = !!features.heatedSeats;
                 document.getElementById('editHeatedSteering').checked = !!features.heatedSteering;
                 document.getElementById('editInbuiltNav').checked = !!features.inbuiltNav;
                 document.getElementById('editLeatherSeats').checked = !!features.leatherSeats;
                 document.getElementById('editMultiZoneClimate').checked = !!features.multiZoneClimate;
+                document.getElementById('editParkingSensors').checked = !!features.parkingSensors;
                 document.getElementById('editPremiumSound').checked = !!features.premiumSound;
                 document.getElementById('editSunroof').checked = !!features.sunroof;
                 document.getElementById('editVentilatedSeats').checked = !!features.ventilatedSeats;
                 document.getElementById('editWirelessCharger').checked = !!features.wirelessCharger;
                 document.getElementById('editOtherFeatures').value = features.other || '';
 
-                const mileageEl = document.getElementById('editMileage');
-                if(collection === 'vehicles') {
-                    mileageEl.classList.remove('hidden');
-                } else {
-                     mileageEl.classList.add('hidden');
-                }
                 document.getElementById('editModal').classList.remove('hidden');
             }
         }).catch(e => { console.error(e); showToast('Error fetching document.'); }).finally(hideSpinner);
@@ -1167,6 +1161,8 @@
                         model: data.model,
                         trim: data.trim,
                         year: data.year,
+                        mileage: data.mileage || '',
+                        link: data.link || '',
                         date: getTodayDate(), // Reset date to today
                         comment: `Moved back for recapture. Original comment: ${data.comment || ''}`, // Pre-fill a comment
                         descriptionFeatures: data.descriptionFeatures || {},
@@ -1206,23 +1202,8 @@
             document.getElementById('aiVehicleInfo').innerText = `${d.year} ${d.make} ${d.model} ${d.trim || ''}`;
             
             const features = d.descriptionFeatures || {};
-            const descriptionItems = [];
-            if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
-            if(features.bluetooth) descriptionItems.push('Bluetooth');
-            if (features.heatedSeats) descriptionItems.push('Heated Seats');
-            if (features.heatedSteering) descriptionItems.push('Heated Steering');
-            if (features.inbuiltNav) descriptionItems.push('Navigation System');
-            if (features.leatherSeats) descriptionItems.push('Leather Seats');
-            if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
-            if (features.premiumSound) descriptionItems.push('Premium Sound');
-            if (features.sunroof) descriptionItems.push('Sunroof/Moonroof');
-            if (features.ventilatedSeats) descriptionItems.push('Ventilated Seats');
-            if (features.wirelessCharger) descriptionItems.push('Wireless Charger');
-            if (features.other) {
-                features.other.split('\n').forEach(f => {
-                    if (f.trim()) descriptionItems.push(f.trim());
-                });
-            }
+            const descriptionItems = getFeaturesText(features).split(' | ');
+
             document.getElementById('aiFeaturesList').innerText = descriptionItems.length ? descriptionItems.join(', ') : 'No special features selected.';
             
             document.getElementById('aiGeneratedText').value = d.generatedDescription || '';
@@ -1253,12 +1234,14 @@
             .filter(([key, value]) => value && key !== 'other')
             .map(([key]) => {
                 if (key === 'appleCarPlay') return 'Apple CarPlay & Android Auto';
+                if (key === 'blindSpot') return 'Blind Spot Monitoring';
                 if (key === 'bluetooth') return 'Bluetooth';
                 if (key === 'heatedSeats') return 'Heated Seats';
                 if (key === 'heatedSteering') return 'Heated Steering';
                 if (key === 'inbuiltNav') return 'Navigation System';
                 if (key === 'leatherSeats') return 'Leather Seats';
                 if (key === 'multiZoneClimate') return 'Multi Zone Climate Control';
+                if (key === 'parkingSensors') return 'Parking Sensors';
                 if (key === 'premiumSound') return 'Premium Sound System';
                 if (key === 'sunroof') return 'Sunroof/Moonroof';
                 if (key === 'ventilatedSeats') return 'Ventilated Seats';
@@ -1422,6 +1405,7 @@
             completedData = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
             document.getElementById('searchCompleted').dispatchEvent(new Event('input'));
             renderDailySummary(document.getElementById('summaryDatePicker').value);
+            renderRecaptureAlerts();
         }, err => { console.error(err); showToast('Error loading completed vehicles.'); });
         
         // Event Listeners
@@ -1442,12 +1426,14 @@
             
             const descriptionFeatures = {
                 appleCarPlay: document.getElementById('editCarplay').checked,
+                blindSpot: document.getElementById('editBlindSpot').checked,
                 bluetooth: document.getElementById('editBluetooth').checked,
                 heatedSeats: document.getElementById('editHeatedSeats').checked,
                 heatedSteering: document.getElementById('editHeatedSteering').checked,
                 inbuiltNav: document.getElementById('editInbuiltNav').checked,
                 leatherSeats: document.getElementById('editLeatherSeats').checked,
                 multiZoneClimate: document.getElementById('editMultiZoneClimate').checked,
+                parkingSensors: document.getElementById('editParkingSensors').checked,
                 premiumSound: document.getElementById('editPremiumSound').checked,
                 sunroof: document.getElementById('editSunroof').checked,
                 ventilatedSeats: document.getElementById('editVentilatedSeats').checked,
@@ -1462,14 +1448,13 @@
                 trim: document.getElementById('editTrim').value.trim(),
                 year: document.getElementById('editYear').value,
                 date: document.getElementById('editDate').value,
+                mileage: document.getElementById('editMileage').value.trim(),
                 comment: document.getElementById('editComment').value,
                 generatedDescription: document.getElementById('editGeneratedDescription').value,
                 descriptionFeatures: descriptionFeatures,
+                link: document.getElementById('editLink').value.trim(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            if (collection === 'vehicles') {
-                data.mileage = document.getElementById('editMileage').value.trim();
-            }
 
             showSpinner();
             try {
