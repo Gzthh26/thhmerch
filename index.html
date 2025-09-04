@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="THH Merch">
     <link rel="apple-touch-icon" href="https://placehold.co/180x180/3b82f6/FFFFFF?text=THH"> <!-- Replace with your 180x180 icon URL -->
-    <link rel="manifest" href="/manifest.json"> <!-- See conclusion for manifest.json content -->
+    <link rel="manifest" href="/manifest.json"> 
 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -172,16 +172,15 @@
 
         <section class="card p-6">
             <h2 class="text-lg font-semibold mb-4">Data Entry</h2>
-            <form id="dataEntryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4">
+            <form id="dataEntryForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 <input id="vinOrStock" placeholder="VIN or Stock No." class="form-input" />
                 <input id="make" placeholder="Make" class="form-input" />
                 <input id="model" placeholder="Model" class="form-input" />
                 <input id="trim" placeholder="Trim" class="form-input" />
                 <select id="year" class="form-input"><option value="">Year</option></select>
-                <input id="mileage" placeholder="Mileage" class="form-input font-bold" />
                 <input id="date" type="date" class="form-input" />
-                <input id="comment" placeholder="Comment (Optional)" class="form-input col-span-full md:col-span-3" />
-                <div class="sm:col-span-2 md:col-span-6 text-right mt-2 flex justify-end space-x-2">
+                <input id="comment" placeholder="Comment (Optional)" class="form-input col-span-full md:col-span-2" />
+                <div class="sm:col-span-2 md:col-span-5 text-right mt-2 flex justify-end space-x-2">
                     <button type="button" id="undoBtn" onclick="undoLastEntry()" class="btn btn-danger disabled:opacity-50" disabled>Undo Last Operation</button>
                     <button type="button" onclick="addPending()" class="btn btn-primary">Add to Pending</button>
                 </div>
@@ -281,12 +280,12 @@
                                 <th>Mileage</th>
                                 <th class="text-center">Detailed</th>
                                 <th>Description</th>
-                                <th class="text-center">Desc. Uploaded</th>
-                                <th class="text-center">Glovebox</th>
+                                <th class="text-center">Desc.</th>
+                                <th class="text-center">GB</th>
                                 <th class="text-center">Recaptured</th>
                                 <th>Photos</th>
                                 <th>Links</th>
-                                <th class="text-center">Actions</th>
+                                <th class="text-center">Sold</th>
                             </tr>
                         </thead>
                         <tbody id="dailySummaryTable"></tbody>
@@ -360,20 +359,23 @@
     <div id="descriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
         <div class="modal-card w-full max-w-md p-6">
             <h3 class="text-lg font-semibold mb-4">Vehicle Description Features</h3>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
-                <div class="flex items-center"><input id="descBlindSpot" type="checkbox" class="form-checkbox mr-3"><label for="descBlindSpot">Blind Spot Monitoring</label></div>
-                <div class="flex items-center"><input id="descBluetooth" type="checkbox" class="form-checkbox mr-3"><label for="descBluetooth">Bluetooth</label></div>
-                <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
-                <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
-                <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Navigation System</label></div>
-                <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
-                <div class="flex items-center"><input id="descMultiZoneClimate" type="checkbox" class="form-checkbox mr-3"><label for="descMultiZoneClimate">Multi Zone Climate</label></div>
-                <div class="flex items-center"><input id="descParkingSensors" type="checkbox" class="form-checkbox mr-3"><label for="descParkingSensors">Parking Sensors</label></div>
-                <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
-                <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof/Moonroof</label></div>
-                <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
-                <div class="flex items-center"><input id="descWirelessCharger" type="checkbox" class="form-checkbox mr-3"><label for="descWirelessCharger">Wireless Charger</label></div>
+            <div class="space-y-4">
+                 <input id="descMileage" placeholder="Mileage" class="form-input font-bold" />
+                 <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
+                    <div class="flex items-center"><input id="descBlindSpot" type="checkbox" class="form-checkbox mr-3"><label for="descBlindSpot">Blind Spot Monitoring</label></div>
+                    <div class="flex items-center"><input id="descBluetooth" type="checkbox" class="form-checkbox mr-3"><label for="descBluetooth">Bluetooth</label></div>
+                    <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
+                    <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
+                    <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Navigation System</label></div>
+                    <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
+                    <div class="flex items-center"><input id="descMultiZoneClimate" type="checkbox" class="form-checkbox mr-3"><label for="descMultiZoneClimate">Multi Zone Climate</label></div>
+                    <div class="flex items-center"><input id="descParkingSensors" type="checkbox" class="form-checkbox mr-3"><label for="descParkingSensors">Parking Sensors</label></div>
+                    <div class="flex items-center"><input id="descPremiumSound" type="checkbox" class="form-checkbox mr-3"><label for="descPremiumSound">Premium Sound</label></div>
+                    <div class="flex items-center"><input id="descSunroof" type="checkbox" class="form-checkbox mr-3"><label for="descSunroof">Sunroof/Moonroof</label></div>
+                    <div class="flex items-center"><input id="descVentilatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descVentilatedSeats">Ventilated Seats</label></div>
+                    <div class="flex items-center"><input id="descWirelessCharger" type="checkbox" class="form-checkbox mr-3"><label for="descWirelessCharger">Wireless Charger</label></div>
+                </div>
             </div>
             <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" onclick="closeDescriptionModal()" class="btn btn-secondary">Cancel</button>
@@ -381,42 +383,6 @@
             </div>
         </div>
     </div>
-
-    <!-- AI Description Generation Modal -->
-    <div id="generateDescriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
-        <div class="modal-card w-full max-w-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">Generate AI Description</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left side: Vehicle Info -->
-                <div class="space-y-4">
-                    <div>
-                        <h4 class="font-medium text-gray-800">Vehicle Details</h4>
-                        <p id="aiVehicleInfo" class="text-sm text-gray-600 mt-1"></p>
-                    </div>
-                    <div>
-                        <h4 class="font-medium text-gray-800">Selected Features</h4>
-                        <p id="aiFeaturesList" class="text-sm text-gray-600 mt-1"></p>
-                    </div>
-                    <button type="button" onclick="generateDescription()" class="btn btn-primary w-full">
-                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" /></svg>
-                        Generate Description
-                    </button>
-                </div>
-                <!-- Right side: Generated Text -->
-                <div class="relative">
-                     <div id="aiSpinner" class="absolute inset-0 bg-white/70 flex items-center justify-center hidden">
-                        <div class="spinner !w-10 !h-10"></div>
-                     </div>
-                    <textarea id="aiGeneratedText" class="form-input w-full h-64" placeholder="AI description will appear here..."></textarea>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" onclick="closeAIDescriptionModal()" class="btn btn-secondary">Cancel</button>
-                <button type="button" onclick="saveAIDescription()" class="btn btn-success">Save Description</button>
-            </div>
-        </div>
-    </div>
-
 
     <!-- View Description Modal -->
     <div id="viewDescriptionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-40 p-4">
@@ -440,12 +406,12 @@
                 <input id="editTrim" placeholder="Trim" class="form-input" />
                 <select id="editYear" class="form-input"><option value="">Year</option></select>
                 <input id="editDate" type="date" class="form-input" />
-                <input id="editMileage" placeholder="Mileage" class="form-input" />
                 <input id="editLink" placeholder="Website Link" class="form-input sm:col-span-2" />
              </div>
              <div class="space-y-4">
                 <div class="border rounded-md p-4">
                     <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
+                    <input id="editMileage" placeholder="Mileage" class="form-input font-bold mb-4" />
                     <div class="grid grid-cols-2 gap-2">
                         <div class="flex items-center"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
                         <div class="flex items-center"><input id="editBlindSpot" type="checkbox" class="form-checkbox mr-2"><label for="editBlindSpot" class="text-sm">Blind Spot Monitoring</label></div>
@@ -464,7 +430,6 @@
                     <textarea id="editOtherFeatures" rows="2" placeholder="Other Features (one per line)" class="form-input w-full mt-3"></textarea>
                 </div>
                 <textarea id="editComment" rows="3" placeholder="Comment" class="form-input w-full"></textarea>
-                <textarea id="editGeneratedDescription" rows="6" placeholder="AI Generated Description" class="form-input w-full"></textarea>
              </div>
              <div class="mt-6 flex justify-end space-x-3">
                 <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
@@ -525,7 +490,6 @@
     const closeCompleteModal = () => document.getElementById('completeModal').classList.add('hidden');
     const closeDescriptionModal = () => document.getElementById('descriptionModal').classList.add('hidden');
     const closeViewDescriptionModal = () => document.getElementById('viewDescriptionModal').classList.add('hidden');
-    const closeAIDescriptionModal = () => document.getElementById('generateDescriptionModal').classList.add('hidden');
     const closeConfirmModal = () => document.getElementById('confirmModal').classList.add('hidden');
 
     const showToast = msg => {
@@ -608,8 +572,10 @@
         document.getElementById(`${key}NextBtn`).disabled = page >= totalPages - 1;
     }
 
-    function getFeaturesText(features) {
+    function getFeaturesText(data) {
+        const features = data.descriptionFeatures || {};
         const descriptionItems = [];
+
         if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
         if (features.blindSpot) descriptionItems.push('Blind Spot Monitoring');
         if (features.bluetooth) descriptionItems.push('Bluetooth');
@@ -635,7 +601,7 @@
         const d = doc.data, days = calculateDays(d.date);
         const badgeStyle = days > 3 ? 'text-red-700 bg-red-100' : 'text-gray-700 bg-gray-100';
         
-        let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
+        let descriptionText = getFeaturesText(d);
         
         const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
         const escapedComment = (d.comment || '').replace(/`/g, '\\`');
@@ -652,7 +618,6 @@
             <td class="comment-cell truncate cursor-pointer" ondblclick="openViewDescriptionModal('Comment', \`${escapedComment}\`)" title="Double-click to view full text">${d.comment || ''}</td>
             <td><div class="flex items-center justify-center space-x-1">
                 <button onclick="openDescriptionModal('${doc.id}')" class="btn btn-secondary text-xs">Features</button>
-                <button onclick="openAIDescriptionModal('${doc.id}')" class="btn btn-primary text-xs">AI Desc</button>
                 <button onclick="openCompleteModal('${doc.id}')" class="btn btn-success text-xs">Complete</button>
                 <button onclick="openEditModal('${doc.id}', 'pending_vehicles')" class="btn btn-warning text-xs">Edit</button>
                 <button onclick="deleteEntry('${doc.id}', 'pending_vehicles')" class="btn btn-danger text-xs">Del</button>
@@ -666,7 +631,7 @@
             ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
             : `<span class="text-red-500 font-bold text-lg">✗</span>`;
         
-        let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
+        let descriptionText = getFeaturesText(d);
         
         const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
         const escapedComment = (d.comment || '').replace(/`/g, '\\`');
@@ -683,7 +648,7 @@
             <td>${d.model}</td>
             <td>${d.trim || ''}</td>
             <td>${d.year}</td>
-            <td>${d.mileage || ''}</td>
+            <td>${(d.descriptionFeatures && d.descriptionFeatures.mileage) || d.mileage || ''}</td>
             <td>${d.date}</td>
             <td class="text-center">${detailedIcon}</td>
             <td>${d.photoType || ''}</td>
@@ -737,7 +702,7 @@
                 ? `<span class="text-green-500 font-bold text-lg">✓</span>` 
                 : `<span class="text-red-500 font-bold text-lg">✗</span>`;
             
-            let descriptionText = d.generatedDescription || getFeaturesText(d.descriptionFeatures || {});
+            let descriptionText = getFeaturesText(d);
             
             const escapedDescriptionText = (descriptionText || '').replace(/`/g, '\\`');
 
@@ -747,7 +712,7 @@
                 <td>${d.model}</td>
                 <td>${d.trim || ''}</td>
                 <td>${d.year}</td>
-                <td>${d.mileage || ''}</td>
+                <td>${(d.descriptionFeatures && d.descriptionFeatures.mileage) || d.mileage || ''}</td>
                 <td class="text-center">${detailedIcon}</td>
                 <td class="text-gray-500 truncate cursor-pointer" style="max-width: 150px;" ondblclick="openViewDescriptionModal('Description', \`${escapedDescriptionText}\`)">${descriptionText.split('\n')[0]}</td>
                 <td class="text-center">${toggleButton('descriptionUploaded', d.descriptionUploaded)}</td>
@@ -755,11 +720,9 @@
                 <td class="text-center">${toggleButton('recaptured', d.recaptured)}</td>
                 <td>${d.photoType}</td>
                 <td>${d.link ? `<a href="${d.link}" target="_blank" class="text-blue-600 hover:underline">THH</a>` : ''}</td>
-                <td class="text-center"><div class="flex items-center justify-center space-x-1">
-                    <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-secondary' : 'btn-success'} text-xs">Sold</button>
-                    <button onclick="openEditModal('${doc.id}', 'vehicles')" class="btn btn-warning text-xs">Edit</button>
-                    <button onclick="deleteEntry('${doc.id}', 'vehicles')" class="btn btn-danger text-xs">Del</button>
-                </div></td>
+                <td class="text-center">
+                     <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-warning' : 'btn-danger'} text-xs">Sold</button>
+                </td>
             </tr>`;
         }).join('');
 
@@ -808,9 +771,9 @@
             model: capitalizeFirst(document.getElementById('model').value.trim()),
             trim: document.getElementById('trim').value.trim(),
             year: document.getElementById('year').value,
-            mileage: document.getElementById('mileage').value.trim(),
             date: document.getElementById('date').value,
             comment: document.getElementById('comment').value.trim(),
+            descriptionFeatures: {},
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         if (!formData.vinOrStock || !formData.make || !formData.model || !formData.year || !formData.date) {
@@ -875,7 +838,6 @@
                 document.getElementById('trim').value = parsedData.trim;
                 document.getElementById('date').value = getTodayDate();
                 document.getElementById('comment').value = '';
-                document.getElementById('mileage').value = ''; // Mileage is not in bulk data
 
                 const docRef = await addPending(true);
                 if (docRef) {
@@ -983,8 +945,9 @@
             const docRef = db.collection('pending_vehicles').doc(currentEdit.id);
             const doc = await docRef.get();
             if (doc.exists) {
+                const pendingDocData = doc.data();
                 await db.collection('vehicles').add({
-                    ...doc.data(), ...completeData, originalEntryDate: doc.data().date, date: getTodayDate(),
+                    ...pendingDocData, ...completeData, originalEntryDate: doc.data().date, date: getTodayDate(),
                     completedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     recaptured: false, descriptionUploaded: false, gloveboxDocuments: false, isSold: false
                 });
@@ -1016,6 +979,7 @@
             const doc = await db.collection('pending_vehicles').doc(id).get();
             currentEdit.data = doc.data();
             const features = currentEdit.data.descriptionFeatures || {};
+            document.getElementById('descMileage').value = features.mileage || '';
             document.getElementById('descCarplay').checked = !!features.appleCarPlay;
             document.getElementById('descBlindSpot').checked = !!features.blindSpot;
             document.getElementById('descBluetooth').checked = !!features.bluetooth;
@@ -1035,6 +999,7 @@
 
     async function saveDescription() {
         const descriptionFeatures = {
+            mileage: document.getElementById('descMileage').value.trim(),
             appleCarPlay: document.getElementById('descCarplay').checked,
             blindSpot: document.getElementById('descBlindSpot').checked,
             bluetooth: document.getElementById('descBluetooth').checked,
@@ -1073,11 +1038,11 @@
                 document.getElementById('editYear').value = d.year || '';
                 document.getElementById('editDate').value = d.date || '';
                 document.getElementById('editComment').value = d.comment || '';
-                document.getElementById('editGeneratedDescription').value = d.generatedDescription || '';
-                document.getElementById('editMileage').value = d.mileage || '';
+                
                 document.getElementById('editLink').value = d.link || '';
 
                 const features = d.descriptionFeatures || {};
+                document.getElementById('editMileage').value = features.mileage || d.mileage || '';
                 document.getElementById('editCarplay').checked = !!features.appleCarPlay;
                 document.getElementById('editBlindSpot').checked = !!features.blindSpot;
                 document.getElementById('editBluetooth').checked = !!features.bluetooth;
@@ -1161,12 +1126,13 @@
                         model: data.model,
                         trim: data.trim,
                         year: data.year,
-                        mileage: data.mileage || '',
                         link: data.link || '',
                         date: getTodayDate(), // Reset date to today
                         comment: `Moved back for recapture. Original comment: ${data.comment || ''}`, // Pre-fill a comment
-                        descriptionFeatures: data.descriptionFeatures || {},
-                        generatedDescription: data.generatedDescription || '',
+                        descriptionFeatures: {
+                            ...(data.descriptionFeatures || {}),
+                            mileage: (data.descriptionFeatures && data.descriptionFeatures.mileage) || data.mileage || ''
+                        },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     await db.collection('pending_vehicles').add(pendingData);
@@ -1180,206 +1146,6 @@
                 hideSpinner();
             }
         });
-    }
-
-
-    // =================================
-    // AI DESCRIPTION FUNCTIONS
-    // =================================
-    async function openAIDescriptionModal(id) {
-        showSpinner();
-        try {
-            const doc = await db.collection('pending_vehicles').doc(id).get();
-            if (!doc.exists) {
-                showToast("Vehicle not found.");
-                return;
-            }
-            currentEdit.id = id;
-            currentEdit.data = doc.data();
-            currentEdit.collection = 'pending_vehicles';
-
-            const d = currentEdit.data;
-            document.getElementById('aiVehicleInfo').innerText = `${d.year} ${d.make} ${d.model} ${d.trim || ''}`;
-            
-            const features = d.descriptionFeatures || {};
-            const descriptionItems = getFeaturesText(features).split(' | ');
-
-            document.getElementById('aiFeaturesList').innerText = descriptionItems.length ? descriptionItems.join(', ') : 'No special features selected.';
-            
-            document.getElementById('aiGeneratedText').value = d.generatedDescription || '';
-            
-            document.getElementById('generateDescriptionModal').classList.remove('hidden');
-        } catch (e) {
-            console.error("Error opening AI modal:", e);
-            showToast("Could not load vehicle data.");
-        } finally {
-            hideSpinner();
-        }
-    }
-
-    async function generateDescription() {
-        const aiSpinner = document.getElementById('aiSpinner');
-        aiSpinner.classList.remove('hidden');
-        document.getElementById('aiGeneratedText').value = '';
-
-        const vehicle = currentEdit.data;
-        if (!vehicle) {
-            showToast("Error: No vehicle data loaded.");
-            aiSpinner.classList.add('hidden');
-            return;
-        }
-
-        const features = vehicle.descriptionFeatures || {};
-        const featureList = Object.entries(features)
-            .filter(([key, value]) => value && key !== 'other')
-            .map(([key]) => {
-                if (key === 'appleCarPlay') return 'Apple CarPlay & Android Auto';
-                if (key === 'blindSpot') return 'Blind Spot Monitoring';
-                if (key === 'bluetooth') return 'Bluetooth';
-                if (key === 'heatedSeats') return 'Heated Seats';
-                if (key === 'heatedSteering') return 'Heated Steering';
-                if (key === 'inbuiltNav') return 'Navigation System';
-                if (key === 'leatherSeats') return 'Leather Seats';
-                if (key === 'multiZoneClimate') return 'Multi Zone Climate Control';
-                if (key === 'parkingSensors') return 'Parking Sensors';
-                if (key === 'premiumSound') return 'Premium Sound System';
-                if (key === 'sunroof') return 'Sunroof/Moonroof';
-                if (key === 'ventilatedSeats') return 'Ventilated Seats';
-                if (key === 'wirelessCharger') return 'Wireless Phone Charger';
-                return '';
-            });
-        
-        if (features.other) {
-            features.other.split('\n').forEach(f => {
-                if(f.trim()) featureList.push(f.trim())
-            });
-        }
-
-        const customFormatInstructions = `
-    You must generate the description using this exact multi-part format, including all headers and footers. Do not deviate.
-
-    ###
-    **[Year] [Make] [Model] [Trim] – [Ownership Status, e.g., One Owner, Clean CarFax]**
-
-    [Engaging opening paragraph - 2-3 sentences max. Example: "Elevate your family journeys with the [Year] [Make] [Model] — a sophisticated SUV that blends premium comfort, safety, and technology in one striking package."]
-
-    **Key Features:**
-    - [Feature 1]
-    - [Feature 2]
-    - [Feature 3]
-    - [List 5-7 key technical and comfort features relevant to the vehicle. Use the provided "Additional Features" as a starting point.]
-
-    **Safety Highlights:**
-    - [Safety Feature 1]
-    - [Safety Feature 2]
-    - [List 3-4 key safety features for this model and year.]
-
-    **Ownership & Condition:**
-    - [List ownership details from the "Full Trim / Details" field, e.g., "One Owner", "Clean CarFax (No Accidents)". If none are provided, omit this section.]
-
-    **Why Buy from Thornhill Hyundai?**
-    At Thornhill Hyundai, we offer top-quality pre-owned vehicles with full transparency, ensuring you drive away with confidence.
-
-    **Please Note:**
-    HST and licensing fees are not included in the listing price. Prices and promotions are subject to change without notice. Contact us for the most up-to-date information.
-    ###
-        `;
-
-        const prompt = `
-            You are an expert car salesperson writing a compelling, professional, and enticing description for a dealership website.
-
-            **Primary Task:**
-            Generate a vehicle description that strictly follows the multi-part format provided in "Dealership's Required Format Instructions". You must identify the core trim and any ownership details (like "One Owner", "Clean CarFax") from the "Full Trim / Details" field to construct the title and the "Ownership & Condition" section.
-
-            **Vehicle Details:**
-            - Year: ${vehicle.year}
-            - Make: ${vehicle.make}
-            - Model: ${vehicle.model}
-            - Full Trim / Details: "${vehicle.trim || 'Standard'}" (This contains the trim name and may also contain ownership info).
-            - Additional Features: ${featureList.join(', ') || 'Standard features'}
-
-            **Context:**
-            - The current date is ${new Date().toDateString()}.
-            - The dealership is "Thornhill Hyundai" located in Vaughan, Ontario, Canada.
-
-            **Dealership's Required Format Instructions:**
-            ---
-            ${customFormatInstructions}
-            ---
-
-            Now, generate the complete description based on all the information and instructions provided.
-        `;
-
-        try {
-            // IMPORTANT: The API key is left blank as it's expected to be injected by the runtime environment.
-            // If this feature fails, it is likely due to the execution environment not providing a valid API key.
-            const apiKey = ""; 
-            const model = "gemini-2.0-flash";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ 
-                    role: "user", 
-                    parts: [{ text: prompt }] 
-                }]
-            };
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                console.error("API Error Response:", result);
-                const errorMsg = result.error?.message || `HTTP error! Status: ${response.status}`;
-                throw new Error(errorMsg);
-            }
-
-            if (result.candidates && result.candidates.length > 0) {
-                const candidate = result.candidates[0];
-                if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-                    const generatedText = candidate.content.parts[0].text;
-                    document.getElementById('aiGeneratedText').value = generatedText;
-                } else {
-                    const finishReason = candidate.finishReason || 'UNKNOWN';
-                    const safetyRatings = JSON.stringify(candidate.safetyRatings) || 'Not available';
-                    console.error(`API response missing content. Finish Reason: ${finishReason}. Safety Ratings: ${safetyRatings}`);
-                    throw new Error(`Generation failed. The AI response was empty. Reason: ${finishReason}.`);
-                }
-            } else {
-                console.error("Invalid API response structure:", result);
-                throw new Error("No response candidates found from the AI service.");
-            }
-        } catch (error) {
-            console.error('Error in generateDescription:', error);
-            showToast(`Error: ${error.message}. Check console for details.`);
-        } finally {
-            aiSpinner.classList.add('hidden');
-        }
-    }
-
-    async function saveAIDescription() {
-        const newDescription = document.getElementById('aiGeneratedText').value;
-        if (!newDescription.trim()) {
-            showToast("Description cannot be empty.");
-            return;
-        }
-        showSpinner();
-        try {
-            await db.collection(currentEdit.collection).doc(currentEdit.id).update({
-                generatedDescription: newDescription
-            });
-            showToast("AI description saved successfully!");
-            closeAIDescriptionModal();
-        } catch (e) {
-            console.error("Error saving AI description:", e);
-            showToast("Could not save the description.");
-        } finally {
-            hideSpinner();
-        }
     }
 
 
@@ -1425,6 +1191,7 @@
             const collection = currentEdit.collection;
             
             const descriptionFeatures = {
+                mileage: document.getElementById('editMileage').value.trim(),
                 appleCarPlay: document.getElementById('editCarplay').checked,
                 blindSpot: document.getElementById('editBlindSpot').checked,
                 bluetooth: document.getElementById('editBluetooth').checked,
@@ -1448,12 +1215,11 @@
                 trim: document.getElementById('editTrim').value.trim(),
                 year: document.getElementById('editYear').value,
                 date: document.getElementById('editDate').value,
-                mileage: document.getElementById('editMileage').value.trim(),
                 comment: document.getElementById('editComment').value,
-                generatedDescription: document.getElementById('editGeneratedDescription').value,
                 descriptionFeatures: descriptionFeatures,
                 link: document.getElementById('editLink').value.trim(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                mileage: firebase.firestore.FieldValue.delete() // remove old top-level field
             };
 
             showSpinner();
