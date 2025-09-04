@@ -285,7 +285,7 @@
                                 <th class="text-center">Recaptured</th>
                                 <th>Photos</th>
                                 <th>Links</th>
-                                <th class="text-center">Sold</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="dailySummaryTable"></tbody>
@@ -409,6 +409,13 @@
                 <input id="editLink" placeholder="Website Link" class="form-input sm:col-span-2" />
              </div>
              <div class="space-y-4">
+                <div id="editRecaptureContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Photos Need Recapture?</label>
+                    <div id="edit-recapture-toggle" class="mt-1 grid grid-cols-2 gap-2 btn-toggle-group">
+                        <button type="button" data-group="edit-recapture" data-value="Yes" class="btn btn-secondary">Yes</button>
+                        <button type="button" data-group="edit-recapture" data-value="No" class="btn btn-secondary">No</button>
+                    </div>
+                </div>
                 <div class="border rounded-md p-4">
                     <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
                     <input id="editMileage" placeholder="Mileage" class="form-input font-bold mb-4" />
@@ -721,7 +728,10 @@
                 <td>${d.photoType}</td>
                 <td>${d.link ? `<a href="${d.link}" target="_blank" class="text-blue-600 hover:underline">THH</a>` : ''}</td>
                 <td class="text-center">
-                     <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-warning' : 'btn-danger'} text-xs">Sold</button>
+                     <div class="flex items-center justify-center space-x-1">
+                        <button onclick="openEditModal('${doc.id}', 'vehicles')" class="btn btn-warning text-xs">Edit</button>
+                        <button onclick="toggleSoldStatus('${doc.id}', ${!!d.isSold})" class="btn ${d.isSold ? 'btn-warning' : 'btn-danger'} text-xs">Sold</button>
+                     </div>
                 </td>
             </tr>`;
         }).join('');
@@ -1057,6 +1067,23 @@
                 document.getElementById('editVentilatedSeats').checked = !!features.ventilatedSeats;
                 document.getElementById('editWirelessCharger').checked = !!features.wirelessCharger;
                 document.getElementById('editOtherFeatures').value = features.other || '';
+                
+                const recaptureContainer = document.getElementById('editRecaptureContainer');
+                if (collection === 'vehicles') {
+                    recaptureContainer.classList.remove('hidden');
+                    const recaptureValue = d.recaptureNeeded || 'No';
+                    document.querySelectorAll('#edit-recapture-toggle .btn').forEach(btn => {
+                        if (btn.dataset.value === recaptureValue) {
+                            btn.classList.add('active', 'btn-primary');
+                            btn.classList.remove('btn-secondary');
+                        } else {
+                            btn.classList.remove('active', 'btn-primary');
+                            btn.classList.add('btn-secondary');
+                        }
+                    });
+                } else {
+                    recaptureContainer.classList.add('hidden');
+                }
 
                 document.getElementById('editModal').classList.remove('hidden');
             }
@@ -1219,8 +1246,16 @@
                 descriptionFeatures: descriptionFeatures,
                 link: document.getElementById('editLink').value.trim(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                mileage: firebase.firestore.FieldValue.delete() // remove old top-level field
             };
+            
+            if (collection === 'vehicles') {
+                const getSelectedValue = (groupName) => {
+                    const activeButton = document.querySelector(`#${groupName}-toggle .btn.active`);
+                    return activeButton ? activeButton.dataset.value : '';
+                };
+                data.recaptureNeeded = getSelectedValue('edit-recapture');
+            }
+
 
             showSpinner();
             try {
@@ -1299,4 +1334,3 @@
 </script>
 </body>
 </html>
-
