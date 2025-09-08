@@ -362,11 +362,13 @@
             <div class="space-y-4">
                  <input id="descMileage" placeholder="Mileage" class="form-input font-bold" />
                  <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center"><input id="descAdaptiveCruise" type="checkbox" class="form-checkbox mr-3"><label for="descAdaptiveCruise">Adaptive Cruise Control</label></div>
                     <div class="flex items-center"><input id="descCarplay" type="checkbox" class="form-checkbox mr-3"><label for="descCarplay">Apple CarPlay & Android Auto</label></div>
                     <div class="flex items-center"><input id="descBlindSpot" type="checkbox" class="form-checkbox mr-3"><label for="descBlindSpot">Blind Spot Monitoring</label></div>
                     <div class="flex items-center"><input id="descBluetooth" type="checkbox" class="form-checkbox mr-3"><label for="descBluetooth">Bluetooth</label></div>
                     <div class="flex items-center"><input id="descHeatedSeats" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSeats">Heated Seats</label></div>
                     <div class="flex items-center"><input id="descHeatedSteering" type="checkbox" class="form-checkbox mr-3"><label for="descHeatedSteering">Heated Steering</label></div>
+                    <div class="flex items-center"><input id="descKeyStarter" type="checkbox" class="form-checkbox mr-3"><label for="descKeyStarter">Key Starter</label></div>
                     <div class="flex items-center"><input id="descInbuiltNav" type="checkbox" class="form-checkbox mr-3"><label for="descInbuiltNav">Navigation System</label></div>
                     <div class="flex items-center"><input id="descLeatherSeats" type="checkbox" class="form-checkbox mr-3"><label for="descLeatherSeats">Leather Seats</label></div>
                     <div class="flex items-center"><input id="descMultiZoneClimate" type="checkbox" class="form-checkbox mr-3"><label for="descMultiZoneClimate">Multi Zone Climate</label></div>
@@ -420,11 +422,13 @@
                     <h4 class="text-sm font-medium text-gray-800 mb-2">Features</h4>
                     <input id="editMileage" placeholder="Mileage" class="form-input font-bold mb-4" />
                     <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center"><input id="editAdaptiveCruise" type="checkbox" class="form-checkbox mr-2"><label for="editAdaptiveCruise" class="text-sm">Adaptive Cruise</label></div>
                         <div class="flex items-center"><input id="editCarplay" type="checkbox" class="form-checkbox mr-2"><label for="editCarplay" class="text-sm">Apple CarPlay & Android Auto</label></div>
                         <div class="flex items-center"><input id="editBlindSpot" type="checkbox" class="form-checkbox mr-2"><label for="editBlindSpot" class="text-sm">Blind Spot Monitoring</label></div>
                         <div class="flex items-center"><input id="editBluetooth" type="checkbox" class="form-checkbox mr-2"><label for="editBluetooth" class="text-sm">Bluetooth</label></div>
                         <div class="flex items-center"><input id="editHeatedSeats" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSeats" class="text-sm">Heated Seats</label></div>
                         <div class="flex items-center"><input id="editHeatedSteering" type="checkbox" class="form-checkbox mr-2"><label for="editHeatedSteering" class="text-sm">Heated Steering</label></div>
+                        <div class="flex items-center"><input id="editKeyStarter" type="checkbox" class="form-checkbox mr-2"><label for="editKeyStarter" class="text-sm">Key Starter</label></div>
                         <div class="flex items-center"><input id="editInbuiltNav" type="checkbox" class="form-checkbox mr-2"><label for="editInbuiltNav" class="text-sm">Navigation System</label></div>
                         <div class="flex items-center"><input id="editLeatherSeats" type="checkbox" class="form-checkbox mr-2"><label for="editLeatherSeats" class="text-sm">Leather Seats</label></div>
                         <div class="flex items-center"><input id="editMultiZoneClimate" type="checkbox" class="form-checkbox mr-2"><label for="editMultiZoneClimate" class="text-sm">Multi Zone Climate</label></div>
@@ -583,11 +587,13 @@
         const features = data.descriptionFeatures || {};
         const descriptionItems = [];
 
+        if (features.adaptiveCruise) descriptionItems.push('Adaptive Cruise Control');
         if (features.appleCarPlay) descriptionItems.push('Apple CarPlay & Android Auto');
         if (features.blindSpot) descriptionItems.push('Blind Spot Monitoring');
         if (features.bluetooth) descriptionItems.push('Bluetooth');
         if (features.heatedSeats) descriptionItems.push('Heated Seats');
         if (features.heatedSteering) descriptionItems.push('Heated Steering');
+        if (features.keyStarter) descriptionItems.push('Key Starter');
         if (features.inbuiltNav) descriptionItems.push('Navigation System');
         if (features.leatherSeats) descriptionItems.push('Leather Seats');
         if (features.multiZoneClimate) descriptionItems.push('Multi Zone Climate');
@@ -990,11 +996,13 @@
             currentEdit.data = doc.data();
             const features = currentEdit.data.descriptionFeatures || {};
             document.getElementById('descMileage').value = features.mileage || '';
+            document.getElementById('descAdaptiveCruise').checked = !!features.adaptiveCruise;
             document.getElementById('descCarplay').checked = !!features.appleCarPlay;
             document.getElementById('descBlindSpot').checked = !!features.blindSpot;
             document.getElementById('descBluetooth').checked = !!features.bluetooth;
             document.getElementById('descHeatedSeats').checked = !!features.heatedSeats;
             document.getElementById('descHeatedSteering').checked = !!features.heatedSteering;
+            document.getElementById('descKeyStarter').checked = !!features.keyStarter;
             document.getElementById('descInbuiltNav').checked = !!features.inbuiltNav;
             document.getElementById('descLeatherSeats').checked = !!features.leatherSeats;
             document.getElementById('descMultiZoneClimate').checked = !!features.multiZoneClimate;
@@ -1010,11 +1018,13 @@
     async function saveDescription() {
         const descriptionFeatures = {
             mileage: document.getElementById('descMileage').value.trim(),
+            adaptiveCruise: document.getElementById('descAdaptiveCruise').checked,
             appleCarPlay: document.getElementById('descCarplay').checked,
             blindSpot: document.getElementById('descBlindSpot').checked,
             bluetooth: document.getElementById('descBluetooth').checked,
             heatedSeats: document.getElementById('descHeatedSeats').checked,
             heatedSteering: document.getElementById('descHeatedSteering').checked,
+            keyStarter: document.getElementById('descKeyStarter').checked,
             inbuiltNav: document.getElementById('descInbuiltNav').checked,
             leatherSeats: document.getElementById('descLeatherSeats').checked,
             multiZoneClimate: document.getElementById('descMultiZoneClimate').checked,
@@ -1053,11 +1063,13 @@
 
                 const features = d.descriptionFeatures || {};
                 document.getElementById('editMileage').value = features.mileage || d.mileage || '';
+                document.getElementById('editAdaptiveCruise').checked = !!features.adaptiveCruise;
                 document.getElementById('editCarplay').checked = !!features.appleCarPlay;
                 document.getElementById('editBlindSpot').checked = !!features.blindSpot;
                 document.getElementById('editBluetooth').checked = !!features.bluetooth;
                 document.getElementById('editHeatedSeats').checked = !!features.heatedSeats;
                 document.getElementById('editHeatedSteering').checked = !!features.heatedSteering;
+                document.getElementById('editKeyStarter').checked = !!features.keyStarter;
                 document.getElementById('editInbuiltNav').checked = !!features.inbuiltNav;
                 document.getElementById('editLeatherSeats').checked = !!features.leatherSeats;
                 document.getElementById('editMultiZoneClimate').checked = !!features.multiZoneClimate;
@@ -1219,11 +1231,13 @@
             
             const descriptionFeatures = {
                 mileage: document.getElementById('editMileage').value.trim(),
+                adaptiveCruise: document.getElementById('editAdaptiveCruise').checked,
                 appleCarPlay: document.getElementById('editCarplay').checked,
                 blindSpot: document.getElementById('editBlindSpot').checked,
                 bluetooth: document.getElementById('editBluetooth').checked,
                 heatedSeats: document.getElementById('editHeatedSeats').checked,
                 heatedSteering: document.getElementById('editHeatedSteering').checked,
+                keyStarter: document.getElementById('editKeyStarter').checked,
                 inbuiltNav: document.getElementById('editInbuiltNav').checked,
                 leatherSeats: document.getElementById('editLeatherSeats').checked,
                 multiZoneClimate: document.getElementById('editMultiZoneClimate').checked,
@@ -1334,3 +1348,4 @@
 </script>
 </body>
 </html>
+
